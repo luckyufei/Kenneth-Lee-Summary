@@ -269,8 +269,8 @@ directive_class是docutils.parser.rst.directive的子类（sphinx也提供了自
   一个Writer Plugin来处理不同的Node。但这个其实影响不大，因为这个关联不算强，
   可以在后续升级的时候再重建这个逻辑，这不影响其他逻辑。
 
-Role
-----
+### Role
+
 
 Role是简单版本的directive，一般directive用在成段的替代上，而Role用在嵌入的文本上，
 类似用::
@@ -288,8 +288,8 @@ Role是简单版本的directive，一般directive用在成段的替代上，而R
 和directive不同的地方是它给定的不是一个类，而是一个函数，但其实本质也没有区别，
 用法完全可以和directive一样的。
 
-Event
------
+### Event
+
 
 Event前面介绍过，用于实现回调。它通过app.add_event()添加，app.connect()挂接，
 app.emit()发起调用。需要具体知道什么事件在什么时机回调的，全文搜emit的位置就可

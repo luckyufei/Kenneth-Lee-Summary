@@ -3,8 +3,7 @@
 
 一个架构设计实例：qemu iommu
 
-介绍
-====
+## 介绍
 
 最近要改进qemu一个iommu驱动的代码，做了一个简单的高层设计，情况比较典型，我把这
 个设计作为一个架构设计的实例说明一些架构设计的概念。
@@ -65,7 +64,7 @@ qemu在实现这个特性的时候，还停留在这样的认识上，所以，�
 
 首先我们用类图建立一下qemu原始设计的概念空间：
 
-.. figure:: _static/qemu_iommu_logic_view.svg
+![](_static/qemu_iommu_logic_view.svg)
 
 我们在创建单板的时候，创建每个物理对象，就会有IOMMU_X和Bus_X，然后我们用IOMMU_X
 的primary_bus属性关联Bus_X，Bus_X发现设备的时候，就可以用这个IOMMU_X创建一个
@@ -84,7 +83,7 @@ PASID的情况下，我们需要给每个PASID一个AS，才符合逻辑语义�
 
 但调整这个关联关系，我们可以做这样一个新的设计：
 
-.. figure:: _static/qemu_iommu_logic_view_new.svg
+![](_static/qemu_iommu_logic_view_new.svg)
 
 第二个问题是怎么把Device ID和PASID传递给translate函数。看着这个逻辑的布局，看起
 来我们有三个方案：
@@ -181,8 +180,7 @@ PCIe是否支持PASID，由一个叫PASID的Capability属性定义。这个定�
   这种情况，好像自己给自己开发，都是显而易见的。但如果在一个企业里开发，人们就
   完全不是这样想了。
 
-总结
-=====
+## 总结
 在本文中，我们做了一个简单的构架设计（或者叫高层设计）的概念空间建模演示。我希
 望读者可以看到，架构设计到底是什么，为什么它是细节设计（或者说编码）不可取代的
 设计，在进入细节设计前，没有一个这样的Layout和权衡的过程，你的选择都是无序的，

@@ -1,8 +1,7 @@
         
 Uacce fork问题建模
 
-介绍
-====
+## 介绍
 
 本文就是简单推演一下Uacce fork特性怎么做的问题，但我每个公共的设计都想当作一个
 架构设计的案例来用，所以就写到这里来了。我尽量让架构方面的讨论独立，放在下面这
@@ -59,7 +58,7 @@ Uacce是我们在Linux内核中放的一个用户态加速器的框架，它其�
 uacce加速加速器可以服务多个进程，每打开一次uacce文件，需要为加速器和进程建立一
 个上下文，这个关系用类图可以这样表达：
 
-.. figure:: _static/uacce_fork1.svg
+![](_static/uacce_fork1.svg)
 
 在这个关系中，file和queue（以下简称q）就是这个上下文的实体，每次打开一个文件，
 就建立一个上下文，这个上下文记住了进程的MM，同时也记住了加速器为这个上下文建立
@@ -69,7 +68,7 @@ uacce加速加速器可以服务多个进程，每打开一次uacce文件，需�
 现在我们考虑fork的情形。为了简化逻辑，我们把mm放到进程里，把uacce_dev忽略掉，把
 这个图表述成这样：
 
-.. figure:: _static/uacce_fork2.svg
+![](_static/uacce_fork2.svg)
 
 .. note::
 
@@ -128,7 +127,7 @@ init_uacce_dev()的时候记录所有的初始化参数，reinit的时候关闭�
 分配一个新的queue给子进程。原来map过qfr的位置要全部重新映射一个新的空间，让程序
 变成这样：
 
-.. figure:: _static/uacce_fork3.svg
+![](_static/uacce_fork3.svg)
 
 这可能有三个地方会出问题：
 
@@ -171,7 +170,7 @@ Linux对普通文件不是这样处理的。Linux的意思是：既然你要另�
 好了，等到copy_mm()发生的时候，它手上有vma，但vma只有file的指针，没有被你拷贝的
 新file的指针，它怎么生成这个拷贝呢？
 
-.. figure:: _static/uacce_fork4.svg
+![](_static/uacce_fork4.svg)
 
 父进程的vma中只有原来的file的指针，file拷贝这个动作，和vma拷贝这个动作不是绑定
 的，可能有多个vma指向同一个file，file可能被不同的人拷贝，你根本不知道拷贝的时候，
@@ -243,7 +242,6 @@ Linux对普通文件不是这样处理的。Linux的意思是：既然你要另�
 pthread_atfork()是可以注册多次的，不会影响其他库，唯一的缺点是对libpthread有依
 赖，用户用不了其他线程库的，这对于基础软件来说不利。
   
-总结
-====
+## 总结
 
 所以，我的结论是：在改硬件设计前，还是保留原来的内核设计，增强用户态的设计吧。

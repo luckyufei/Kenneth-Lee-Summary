@@ -4,8 +4,7 @@ Linux RAS特性分析
 （如果你看到这一行，说明本文仍处于修改状态，内容正在进行逻辑整理和信息确认，非
 常不可靠）
   
-介绍
-====
+## 介绍
 
 RAS，是Reliabilty，Availability，Serviceability的缩写，是对一台服务器可以被可靠
 使用的要求。这个是个相当粗糙的定义。如果深入一点理解，所谓R，表示服务器提供正确
@@ -134,8 +133,7 @@ BIOS层提供了标准的报告形式。APEI是ACPI Platform Error Interface的�
 
 只要硬件提供APEI接口，Linux上就不需要额外的驱动了。
   
-MCE
-====
+## MCE
 
 Linux还有一个传统的报告系统，这个是硬件的概念，所谓Machine Check Exception，也
 是用于报告EDAC类似的错误的，但现在这个主要是比如PowerPC用得比较多，在x86上，现
@@ -196,8 +194,7 @@ RAS是Linux下一个常用的ras收集器，很多高级服务器当然会提供
 Linux的故障注入做得很分散，每个独立的功能有自己独立的故障注入方式，AER有AER自己
 的，APEI有APEI自己的，memory的同步故障则通过HWPOISON_INJECT来注入。
   
-小结
-====
+## 小结
 
 总结起来，Linux现在提供了基本的RAS功能(重点是保证R），足以支撑“有错必须要知道”
 这样的需要。主线方案应该是APEI+ftrace+rasdaemon。支持好这个，就提供了Linux最基

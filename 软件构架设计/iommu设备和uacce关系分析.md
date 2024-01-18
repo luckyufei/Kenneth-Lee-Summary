@@ -39,7 +39,7 @@ asid。这个肯定是指望hypervisor来干了，hypervisor要先通过/dev/iom
 共同管理设备io空间和iommu的关系。现在iommu的sva功能是被uacce驱动的，实际上就没有
 准备好像/dev/iommu这样使用，我们首先要避免的是/dev/iommu把我们的依赖修改了。
 
-.. figure:: _static/uacce_vs_uiommu.svg
+![](_static/uacce_vs_uiommu.svg)
 
 丢开对uacce业务场景的支持，我们单独研究一下/dev/iommu这个设计好不好。
 

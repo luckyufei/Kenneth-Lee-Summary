@@ -156,7 +156,7 @@ HIDL本质上是对Binder接口的封装，源文件用hal做扩展名，很类�
 
 拿个现场的图来看更简单：
 
-..figure::treble.jpg
+![](treble.jpg)
 
 在内核上，Treble推出了一个公共的主线：
 https://android.googlesource.com/kernel/common/，但从介绍材料上看是推荐性质的，
@@ -164,7 +164,7 @@ https://android.googlesource.com/kernel/common/，但从介绍材料上看是推
 的项目是要拉着几个主要的供应商一起维护这个内核，但以AOSP现在的升级速度，我觉得
 真正实现这个会比较困难。
 
-..figure::treble2.jpg
+![](treble2.jpg)
 
 Treble要求各家必须使用ko的方式提供驱动，然后尝试把通用内核和驱动放在vboot分区上
 ，Soc相关驱动放SoC分区上，ODM的相关驱动放在ODM分区上。希望可以独立升级通用内核
@@ -188,8 +188,7 @@ Treble花了三年成了现在的样子，有一个很重要的要素是这两�
 对了，演讲207中提到Treble把SELinux作为基础的安全保护错误，避免system和vendor的
 代码可以访问其他分区。这个有空到是可以看看具体是怎么设计的。
 
-SPDX
-=====
+## SPDX
 
 最近上传LinuxKernel的代码的时候，都是拷贝别人的版权声明头，比如这样：::
 
@@ -268,7 +267,7 @@ Linux在O(1)之前的调度器基本上是个玩具，那个东西我们就忽�
 的原理。从名字就能看出来，O(1)算法是要保证取下一个运行任务的时候，算法复杂度是
 O(1)，它用这样的数据结构：
 
-..figure::o1调度.jpg
+![](o1调度.jpg)
 
 待运行的任务都挂在Active队列下面，每个Active分优先级Hash开，在用一个bitmap标记
 哪个队列中有任务，这样，要投入运行，只要检查一下bitmap，然后拿那个队列的第一个
@@ -380,8 +379,8 @@ Linux内核进展越来越快，越来越成熟。现在上传一个特性到内
 下。我看了一下代码，这个基本上是个很自由的测试用例，框架本身仅仅是提供错误计数
 一类的东西，其他是你爱怎么写就怎么写。
 
-gcov
------
+### gcov
+
 这是把gcov的功能用到内核上。在用户态做单元测试一般会用gcov和lcov检查覆盖率的，
 这个功能现在在内核中也可以用了。它通过配置项CONFIG_GCOV_KERNEL使能。开启后，可
 以在/sys/kernel/debugfs/gcov找到所有跟踪数据文件（.gcda)，用gcov命令就可以直接
@@ -475,8 +474,7 @@ AutoFDO依赖于PMU的这个特性：PERF_SAMPLE_BRANCH_STACK。简单说，就�
 ，它可以直接从硬件的角度跟踪事件，我感觉对芯片设计师的作用大于软件设计师。用法
 和不同的perfrecord/report的模式基本上是一样的。
 
-其他
-====
+## 其他
 
 最后补充一些零碎的关注点：
 
@@ -484,7 +482,7 @@ AutoFDO依赖于PMU的这个特性：PERF_SAMPLE_BRANCH_STACK。简单说，就�
   板都没有104中ARM总结了一下Aarch8的特性引入时间，感觉挺有助于记忆的，我贴上来
   ：
 
-  .. figure:: _static/lkft.jpg
+![](_static/lkft.jpg)
 
 * Home - Akraino Edge Stack，ARM热推的“雾计算”的一个实现，我觉得是一个卖轻量级
   服务器的市场

@@ -64,9 +64,9 @@ https://www.packet.net
 
 Cavium Thunder X2，也是1U半框，以计算力为中心，不像Centriq那样留下很多磁盘位。
 
-  .. figure:: _static/thunder2.jpg
+![](_static/thunder2.jpg)
 
 Socinext做的小开发Desktop：
 
-  .. figure:: _static/socinext.jpg
+![](_static/socinext.jpg)
 

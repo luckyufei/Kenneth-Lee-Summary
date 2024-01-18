@@ -1,8 +1,7 @@
         
 CSS布局
 
-介绍
-====
+## 介绍
 
 本文介绍CSS的布局逻辑，但写作的目的其实不是介绍CSS的布局，而是说明怎么学习。
 
@@ -81,7 +80,7 @@ CSS布局
 那么Layout是什么呢？我其实不知道，但我光从文字上能猜到一些：这应该是说明整个段
 落具体怎么放的问题，就好比我经常看的论文就是这样Layout的：
 
-.. figure:: _static/论文排版.png
+![](_static/论文排版.png)
 
 怎么说明我们希望放完左边再放右边呢？
 
@@ -93,7 +92,7 @@ HTML是按一个树状结构：一个html包括<head>和<body>两个分支，<bo
 
 举个例子，一个空的HTML，你就写几个个<p>（段落），在html页面上它就是这样放的：
 
-.. figure:: _static/html_layout1.svg
+![](_static/html_layout1.svg)
 
 把<p>换成<div>也是一样的，先每人占一行，如果规定这一行有多高，它就会限制大小，
 不限制，就看里面的文字有多大了。
@@ -102,7 +101,7 @@ HTML是按一个树状结构：一个html包括<head>和<body>两个分支，<bo
 置一个属性，display=flex（这个单词是肌肉、松紧带的意思），表示尽量压缩在一起放。
 它就是这样的：
 
-.. figure:: _static/html_layout2.svg
+![](_static/html_layout2.svg)
 
 所以，说到底我们就是通过这种display参数，选择对本树节点下面的每个子节点如何放
 置的一个描述，display的参数可以是：
@@ -112,16 +111,15 @@ HTML是按一个树状结构：一个html包括<head>和<body>两个分支，<bo
 
 下面是2x3grid的layout样子：
 
-.. figure:: _static/html_layout3.svg
+![](_static/html_layout3.svg)
 
 还有一种不用display的设置方法是用float，表示其他人绕着它放，做出来是这样的：
 
-.. figure:: _static/html_layout4.svg
+![](_static/html_layout4.svg)
 
 不过这些都不重要了，都可以查到。理解了这个思路，剩下不过是上网搜索的问题而已。
 
-总结
-====
+## 总结
 
 我自己很喜欢写笔记，本文也是一个例子，说明写总结为什么重要。因为只有你带着目标
 去不断收集信息，才有可能把自己的认知分辨出来，完成一次study，这是大学里主要要

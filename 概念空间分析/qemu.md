@@ -3,8 +3,7 @@ qemu概念空间分析
 
 :index:`qemu`
 
-介绍
-=====
+## 介绍
 
 最近修改qemu的东西越来越多，很多原来可以忽略的概念都不得不去面对了，基于这个初
 始文档把内容扩展为一个完整的概念空间分析：
@@ -110,8 +109,7 @@ Qemu有两种运行模式：softmmu和user，前者模拟整个系统，后者�
 所以只要模拟系统调用的行为就可以了，很多时候这种模拟的速度会快很多，如果要在一
 个平台上支持多种平台的进程，这是一种相当好的方式。
 
-QOM
-====
+## QOM
 
 Qemu的代码主要是基于C的，不支持面向对象特性，但偏偏设备极为适合使用面向对象管理
 。所以Qemu写了一套用C模拟的面向对象接口，QOM，Qemu Object Model。Qemu几乎所有被
@@ -176,7 +174,7 @@ props
 
 在内存上的理解用下面这张图表达：
 
-.. figure:: _static/qom_mem_model.svg
+![](_static/qom_mem_model.svg)
 
 QoM可以动态构架，只要内存中有对应的函数，class和instance的空间，相关的设施就可
 以成立。
@@ -389,7 +387,7 @@ system_memory和system_io可以通过get_system_memory()和get_system_io()获得
 
 整个概念可以用下图展示：
 
-.. figure:: _static/memory_region.svg
+![](_static/memory_region.svg)
 
 我们通过例子看看MR的创建方法。
 
@@ -566,8 +564,7 @@ pci_setup_iommu()设置回调，之后每个EP注册到这个总线上，就会�
   就预期这只是一个index，而不是一个值，但要把pasid编码进来，未来如果有更多参数
   ，这就不好发展了。
 
-中断
-=====
+## 中断
 在qemu中，中断本质是cpu_exec()过程中的一个定期判断（如果是KVM一类的真正执行就靠
 KVM本身的硬件机制了，那个原理可以自然想像）。
 
@@ -1105,8 +1102,8 @@ CPU的状态定义在它的QoM的State中，由加速器在模拟的过程中进
 单认为每个虚拟的CPU就是Host上的一个线程，在这个线程之内的调用，都是串行的，只有
 访问CPU间的数据结构才需要上锁保护。
 
-TCG
-----
+### TCG
+
 
 TCG，Tiny Code Generator，是Qemu最基本的模拟加速器，它是一个纯软件的模拟器，可
 以在任何qemu支持的平台上，模拟任何其他硬件平台。
@@ -1466,8 +1463,8 @@ aio_context_acquire/release()，也是个mutex。它的存在主要是为了帮�
 要是块设备）挂在它上面的事件处理独立运行，如果需要发回主线程处理，就只能通过发
 消息回去main iothread中来完成了。
   
-RCU
-----
+### RCU
+
 
 qemu也支持类似内核的RCU机制（从liburcu移植过来的），接口是这样的：
 
