@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 弟子规：美国军方禁止在C语言程序中使用malloc
-********************************************
 
 今天有朋友分享了一个今日头条文档，标题是这样的：《为了更加安全稳定，美国军方禁
 止在C语言中使用malloc》。
@@ -31,7 +26,7 @@
 DO-178B是什么？我一时也看不完（关键是这个文本好像不是可以公开下载的），但这是人
 家的文档体系：
 
-        .. figure:: _static/do178b.jpg
+  .. figure:: _static/do178b.jpg
 
 它可是从开发流程开始定义整个策略的。这也符合我对美国整个技术体系的认识，我看过
 的大部分美国标准，都是这样从大问题开始分解，从流程，到方法，到部件的具体要求，
@@ -58,8 +53,7 @@ DO-178B是什么？我一时也看不完（关键是这个文本好像不是可�
 
 当然，最怕的是你的领导让你背这种弟子规，那你就只好自求多福了，主要看看他给多少
 钱吧，记得算上青春损失费什么的。
-
-
+  
 补充1.20190617：谢谢有读者私信我这个“头条”的英文原文是出自哪里的：
 http://mil-embedded.com/articles/justifiably-apis-militaryaerospace-embedded-code/
 。他可能觉得该“头条”可能仅仅是个“标题党”，从内容上说，这位读者认为“至少美国军方
@@ -96,19 +90,19 @@ malloc()/free() APIs in military/aerospace embedded code。译成中文大概是
 
 美国军方禁止在C语言中使用malloc的说法，在这个Steve的英文版本是这样表述的：
 
-        | But dynamic allocation is widely considered taboo in 
-        | safety-critical embedded software. The use of the C 
-        | runtime library’s malloc() and free() APIs, which do 
-        | the grunt work of dynamic allocation, can introduce 
-        | disastrous side effects such as memory leaks or 
-        | fragmentation. Further, malloc() can exhibit wildly
-        | unpredictable performance and become a bottleneck in
-        | multithreaded programs on multicore systems. Due to 
-        | its risk, dynamic memory allocation is forbidden, under
-        | the DO-178B standard, in safety-critical embedded avionics
-        | code. Due to its risk, dynamic memory allocation is 
-        | forbidden, under the DO-178B standard, in safety-critical 
-        | embedded avionics code.
+  | But dynamic allocation is widely considered taboo in 
+  | safety-critical embedded software. The use of the C 
+  | runtime library’s malloc() and free() APIs, which do 
+  | the grunt work of dynamic allocation, can introduce 
+  | disastrous side effects such as memory leaks or 
+  | fragmentation. Further, malloc() can exhibit wildly
+  | unpredictable performance and become a bottleneck in
+  | multithreaded programs on multicore systems. Due to 
+  | its risk, dynamic memory allocation is forbidden, under
+  | the DO-178B standard, in safety-critical embedded avionics
+  | code. Due to its risk, dynamic memory allocation is 
+  | forbidden, under the DO-178B standard, in safety-critical 
+  | embedded avionics code.
 
 首先这个家伙就不是个好鸟，前面他还在说malloc，后面强行代理为了dynamic memory
 allocation。而中文版再把这个代理的结果放到标题上。
@@ -116,9 +110,9 @@ allocation。而中文版再把这个代理的结果放到标题上。
 但根据这里（Dynamic Memory Allocation: Justifiably Taboo?）的引用，DO-178B的表
 述是这样的：
 
-        | Software Design Standards should include…constraints 
-        | on design, for example, exclusion of recursion, dynamic 
-        | objects, data aliases, and compacted expressions.
+  | Software Design Standards should include…constraints 
+  | on design, for example, exclusion of recursion, dynamic 
+  | objects, data aliases, and compacted expressions.
 
 这个Steve其实是强行把dynamic objects代理为了malloc，然后提出另一个dynamic
 object算法，证明：我没有使用malloc，所以我没有使用dynamic object。从而买盐：我
@@ -127,9 +121,9 @@ object算法，证明：我没有使用malloc，所以我没有使用dynamic obj
 他很可能可以卖给军方，但原因恰恰是，DO-178B并没有下很强硬的“断言”，DO-178B使用
 了非常技巧的要求：
 
-        | 软件设计标准（前面在定义流程的时候可能要求设计过程需要有标准）
-        | 应该在设计中包含……限制，比如禁止使用递归，动态对象，数据别名
-        | 和compacted expressions（不知道这是啥）。
+  | 软件设计标准（前面在定义流程的时候可能要求设计过程需要有标准）
+  | 应该在设计中包含……限制，比如禁止使用递归，动态对象，数据别名
+  | 和compacted expressions（不知道这是啥）。
 
 注意到了吗？DO-178B并不敢肯定你一定是不能用动态对象的，它只是“建议”你考虑把这样
 的要求写入你的编程规范。如果你傻不拉几为了脑子的方便，就把“不得使用malloc，或者
@@ -137,8 +131,7 @@ object算法，证明：我没有使用malloc，所以我没有使用dynamic obj
 
 希望这个例子让某些架构师或者“领导”理解，你们那些所谓“一心向好”，“严格要求”，“有
 比没有好”，能给竞争力带来多大的伤害。
-
-
+  
 补充2.20190619：今天回来看到几个讨论，我不知道是我表述得不够清楚，还是他们根本
 就是只看了一个标题，所以我更直接地表述一下我的观点：我不反对“美国军方某些人在审
 计特定软件的时候看到了malloc会条件反射地拒绝这个软件。”，我在表述的是：把一个复

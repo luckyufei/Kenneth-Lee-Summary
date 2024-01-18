@@ -1,13 +1,7 @@
-.. Kenneth Lee 版权所有 2018-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 infiniband概念空间分析
-**********************
 
-文档概要
-========
+## 文档概要
 
 最近在考虑把我们的加速器方案扩展到infiniband（以下简称ib）的概念空间中，所以解
 构一下它的概念空间，看看这样做的可能性有多少。
@@ -16,22 +10,19 @@ infiniband概念空间分析
 管理：
 
 V0.1.20181125
-        Kenneth Lee 完成初步概念构建，只对了代码，还没有编程验证，待进一步细化
+  Kenneth Lee 完成初步概念构建，只对了代码，还没有编程验证，待进一步细化
 
 V0.2.20181126
-        Kenneth Lee 补充MR相关的更多语义过，重新组织了结论的表述方式（但不改变
-        结论）
+  Kenneth Lee 补充MR相关的更多语义过，重新组织了结论的表述方式（但不改变
+  结论）
 
 V0.3.20181130
-        Kenneth Lee 补充处于安全区加速器的讨论
-
-
+  Kenneth Lee 补充处于安全区加速器的讨论
+  
 IB是跨平台的，但本文仅分析Linux的实现，分析基于当前最新的Linux Kernel版本
 4.20-rc1和rdma-core stable-v15
-
-
-基础概念空间
-============
+  
+## 基础概念空间
 
 我原来做我们的加速器方案的时候，很多共享地址空间相关的方案都参考过InfiniBand的
 umem的方案，我们自己也有RDMA的硬件解决方案，但我从来没有考虑过要把加速器集成到
@@ -44,17 +35,17 @@ IB的基础理念是这样的：我有一个程序，要和另一个程序（可
 相协助，这种协助可以被抽象为：
 
 1. 程序A和程序B建立一个双工管道QP（Queue Pair，包含两个CQ，一个Send Complete
-   Queue和一个Receive Complete Queue），一方要求另一个干什么，只要把请求WR（
-   Work Request)，写到对应的CQ中，另一方对这种请求进行响应，这个模型就可以建立
-   起来了
+  Queue和一个Receive Complete Queue），一方要求另一个干什么，只要把请求WR（
+  Work Request)，写到对应的CQ中，另一方对这种请求进行响应，这个模型就可以建立
+  起来了
 
 2. WR可以说明请求是什么，这种请求被抽象为特定的原语（称为verb），verb中可以索引
-   内存，这种被索引的内存称为MR（Memory Region），verb可以更新对方的MR，实现远
-   程进程的内存更新，这称为RDMA
+  内存，这种被索引的内存称为MR（Memory Region），verb可以更新对方的MR，实现远
+  程进程的内存更新，这称为RDMA
 
 这个概念我们用下面这幅图来表达：
 
-        .. figure:: _static/ib1.jpg
+  .. figure:: _static/ib1.jpg
 
 在实现理念上，IB心目中的Application可以在用户态，也可以在内核态（统称Client），
 但为了保证效率，IB认为，这个通讯是直接和硬件沟通的，不经过第三方的软件代理。也
@@ -89,7 +80,7 @@ QP是直接mmap到用户态的，MR也是直接暴露为实际的内存，直接
 
 这样，这些通讯方就构成这样一个协议栈了：
 
-        .. figure:: _static/ib2.jpg
+  .. figure:: _static/ib2.jpg
 
 下层的通讯栈可以根据不同的通讯协议承载在不同的协议上的，最常见的协议当然是
 Mellanox的Infiniband协议了，这也是它总造成误会的原因。IB软件框架和IB通讯协议，
@@ -100,14 +91,14 @@ Socket实现了一个Transport Layer，下面根本就没有那些层次，但�
 从这个角度来看，比如你做了一个压缩引擎的加速器，你完全可以把这个加速引擎本身作
 为一个通讯方构成这样的一个构架：
 
-        .. figure:: _static/ib3.jpg
+  .. figure:: _static/ib3.jpg
 
 这是不考虑通讯本身的语义的情况，但如前所述，实际上IB是从通讯发展起来的（实际上
 主要就是发明了支持上层做verb和rdma语义的专用硬件），所以它的QP在一定程度上是认
 知下面的通讯层的。所以，我们还需要认知在这个语义空间中，有CA，HCA，TCA，Switch
 ，Channel这个概念（图片来自IBTA）：
 
-        .. figure:: _static/ib4.jpg
+  .. figure:: _static/ib4.jpg
 
 但大部分时候我们都用不上，但我们可以知道的是CA就是Channel Adapter，指那个支持通
 讯的设备，TCA和HCA是target和Host CA。Channel是连接TCA和HCA的一条通道（连接），
@@ -121,10 +112,8 @@ cm（connection management）管理连接（找到对端），有如下子概念
 received acknowledgement），sid（service id）
 
 上帝保佑，暂时不要让我碰到它们，反正我暂时不需要“对端”。
-
-
-verbs名称空间的进一步理解
-=========================
+  
+## verbs名称空间的进一步理解
 
 现在对qp和verbs的名称空间做进一步的理解。如前所述，ib的应用，可以在内核态，也可
 以在用户态，两者只是API接口不同，语义是类似的（但内核用ib_register_client()的概
@@ -138,13 +127,13 @@ qp的名称空间基本上可以从libibverbs/verbs.h上看出来
 
 综合起来这个过程大概是这样的：::
 
-        dev = find_a_matched_device(ibv_get_device_list());
-        ctx =  ibv_open_device(dev)
-        pd =  ibv_alloc_pd(context)
-        send_cq = ibv_create_cq(ctx, ...);
-        recv_cq = ibv_create_cq(ctx, ...);
-        qp = ibv_create_qp(pd, qp_attr(send_cq, recv_cq, ...));
-        ibv_modify_qp(qp, attr, attr_mask);
+  dev = find_a_matched_device(ibv_get_device_list());
+  ctx =  ibv_open_device(dev)
+  pd =  ibv_alloc_pd(context)
+  send_cq = ibv_create_cq(ctx, ...);
+  recv_cq = ibv_create_cq(ctx, ...);
+  qp = ibv_create_qp(pd, qp_attr(send_cq, recv_cq, ...));
+  ibv_modify_qp(qp, attr, attr_mask);
 
 然后就可以用ibv_post_send()和ibv_post_recv()来进行verb的收发了。
 
@@ -162,29 +151,28 @@ ibv_modify_qp主要是用于通讯的相关细节的设置，ibv_create_qp仅仅
 ibv_post_send和recv用于发送verb，verb承载在一个称为ibv_send_wr或者ibv_recv_wr的
 数据结构中，里面是verb类型和mr的相关细节。verb的类型包括：::
 
-        enum ibv_wr_opcode { 
-                IBV_WR_RDMA_WRITE,  
-                IBV_WR_RDMA_WRITE_WITH_IMM, 
-                IBV_WR_SEND,
-                IBV_WR_SEND_WITH_IMM,
-                IBV_WR_RDMA_READ,
-                IBV_WR_ATOMIC_CMP_AND_SWP,
-                IBV_WR_ATOMIC_FETCH_AND_ADD, 
-                IBV_WR_LOCAL_INV, 
-                IBV_WR_BIND_MW,
-                IBV_WR_SEND_WITH_INV,
-                IBV_WR_TSO,
-        };
+  enum ibv_wr_opcode { 
+  IBV_WR_RDMA_WRITE,  
+  IBV_WR_RDMA_WRITE_WITH_IMM, 
+  IBV_WR_SEND,
+  IBV_WR_SEND_WITH_IMM,
+  IBV_WR_RDMA_READ,
+  IBV_WR_ATOMIC_CMP_AND_SWP,
+  IBV_WR_ATOMIC_FETCH_AND_ADD, 
+  IBV_WR_LOCAL_INV, 
+  IBV_WR_BIND_MW,
+  IBV_WR_SEND_WITH_INV,
+  IBV_WR_TSO,
+  };
 
 ULP层的消息都可以通过IBV_WR_SEND_XXXX来封装，其他的就是在IB层就可以处理的RDMA操
 作和原子操作。
 
-mr名称空间的进一步理解
-======================
+## mr名称空间的进一步理解
 
 mr基于ctx创建，通过verb进行分享和更新。先看看mr的创建方法：::
 
-        mr = ibv_reg_mr(pd, addr, length, access);
+  mr = ibv_reg_mr(pd, addr, length, access);
 
 基本上是直接给定一个虚拟地址，ib负责帮你创建一个句柄，创建的mr中包含一个lkey和
 一个rkey，前者用于本地索引，后者用于远程索引。
@@ -193,8 +181,8 @@ mr还有一些扩展概念：
 
 首先是fmr，fast mr，用法如下：::
 
-        fmr = ib_alloc_fmr(pd, flags, attr);
-        ib_map_phys_fmr(fmr, page_list, list_len, iova);
+  fmr = ib_alloc_fmr(pd, flags, attr);
+  ib_map_phys_fmr(fmr, page_list, list_len, iova);
 
 这个概念仅在内核有效，其实就是mem_pool版本的mr，个人认为不影响整个概念空间。
 
@@ -203,8 +191,8 @@ mr还有一些扩展概念：
 
 第三个概念是mw，memory window ，用法如下：::
 
-        wm = ibv_alloc_wm(pd, type);
-        ibv_bind_mw(qp, mw, mw_bind)
+  wm = ibv_alloc_wm(pd, type);
+  ibv_bind_mw(qp, mw, mw_bind)
 
 其中的mw_bind用来指定一个mr内的区域的读写属性，其实就是在mr中割一段空间出来，指
 定它的权限。这个功能在当前的rdma-core的代码中没有看到用户。
@@ -229,10 +217,8 @@ IB在这里提供的增值仅仅是gup加上dma_map，这不是所有dma操作�
 
 而IB的ODP（On Demand Page）虽然可以成为SVA/SVM的封装，允许创建MR的时候不gup MR
 的内存，但它并不需要SVA的共享页表能力。
-
-
-安全区问题
-===========
+  
+## 安全区问题
 
 上面这个讨论建立在非安全区的加速器上，但我们还常常遇到安全区加速器的问题。比如
 你有一段内存需要解密，对应的密钥在安全区，这种情况下使用IB框架就是合理的了。这

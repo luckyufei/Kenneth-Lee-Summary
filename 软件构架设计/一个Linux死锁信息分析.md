@@ -1,61 +1,56 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 一个Linux死锁信息分析
-*********************
 
 这两天在遇到一个死锁的问题，信息大概是这样的：::
 
-        ======================================================
-        WARNING: possible circular locking dependency detected
-        ...
-        ------------------------------------------------------
-        test_dummy/827 is trying to acquire lock:
-        (____ptrval____) (kn->count#4){++++}, at: kernfs_remove_by_name_ns+0x5c/0xb8
-        but task is already holding lock: 
-        (____ptrval____) (xxxxx_mutex){+.+.}, at: xxxxxxxxxx+0x30/0xb8
-        which lock already depends on the new lock.
-        the existing dependency chain (in reverse order) is:
-        -> #2 (xxxxx_mutex){+.+.}:
-               lock_acquire+0xd4/0x250
-               __mutex_lock+0x8c/0x868
-               mutex_lock_nested+0x3c/0x50
-        ...
-                work_pending+0x8/0x14
+  ======================================================
+  WARNING: possible circular locking dependency detected
+  ...
+  ------------------------------------------------------
+  test_dummy/827 is trying to acquire lock:
+  (____ptrval____) (kn->count#4){++++}, at: kernfs_remove_by_name_ns+0x5c/0xb8
+  but task is already holding lock: 
+  (____ptrval____) (xxxxx_mutex){+.+.}, at: xxxxxxxxxx+0x30/0xb8
+  which lock already depends on the new lock.
+  the existing dependency chain (in reverse order) is:
+  -> #2 (xxxxx_mutex){+.+.}:
+  lock_acquire+0xd4/0x250
+  __mutex_lock+0x8c/0x868
+  mutex_lock_nested+0x3c/0x50
+  ...
+  work_pending+0x8/0x14
 
-        -> #1 (&hw->mutex){+.+.}:
-               lock_acquire+0xd4/0x250
-               __mutex_lock+0x8c/0x868
-        ...
-                el0_svc+0x8/0xc
+  -> #1 (&hw->mutex){+.+.}:
+  lock_acquire+0xd4/0x250
+  __mutex_lock+0x8c/0x868
+  ...
+  el0_svc+0x8/0xc
 
-        -> #0 (kn->count#4){++++}:
-                __lock_acquire+0x10ac/0x11d0
-                lock_acquire+0xd4/0x250
-                __kernfs_remove+0x2f4/0x348
-                kernfs_remove_by_name_ns+0x5c/0xb8
-        ...
-                work_pending+0x8/0x14
+  -> #0 (kn->count#4){++++}:
+  __lock_acquire+0x10ac/0x11d0
+  lock_acquire+0xd4/0x250
+  __kernfs_remove+0x2f4/0x348
+  kernfs_remove_by_name_ns+0x5c/0xb8
+  ...
+  work_pending+0x8/0x14
 
-        other info that might help us debug this:
+  other info that might help us debug this:
 
-        Chain exists of:
-          kn->count#4 --> &hw->mutex --> xxxxx_mutex
+  Chain exists of:
+  kn->count#4 --> &hw->mutex --> xxxxx_mutex
 
-        Possible unsafe locking scenario:
-               CPU0                    CPU1
-               ----                    ----
-          lock(xxxxx_mutex);
-                                       lock(&hw->mutex);
-                                       lock(xxxxx_mutex);
-          lock(kn->count#4);
-         *** DEADLOCK ***
+  Possible unsafe locking scenario:
+  CPU0                    CPU1
+  ----                    ----
+  lock(xxxxx_mutex);
+  lock(&hw->mutex);
+  lock(xxxxx_mutex);
+  lock(kn->count#4);
+  *** DEADLOCK ***
 
-        2 locks held by test_dummy/827:
-         #0: (____ptrval____) (&hw->mutex){+.+.}, at: xxxxxxxxx+0x34/0x98
-         #1: (____ptrval____) (xxxxx_mutex){+.+.}, at: xxxxxxxxxx+0x30/0xb8
+  2 locks held by test_dummy/827:
+  #0: (____ptrval____) (&hw->mutex){+.+.}, at: xxxxxxxxx+0x34/0x98
+  #1: (____ptrval____) (xxxxx_mutex){+.+.}, at: xxxxxxxxxx+0x30/0xb8
 
 这个事情很奇怪，我不觉得它提出来的Possible unsafe locking scenario真的会死锁啊
 。
@@ -103,18 +98,18 @@ lockdep_assert_is_held()，或者确认锁不会被中途释放的lockdep_*pin_l
 第一，错误输出中，每个锁后面{+.+.}是什么意思。从代码上看（吐一句槽：这个代码写
 得极其晦涩，看着难受），这是4个上下文的状态标记。上下文分别是：::
 
-        LOCK_USED_IN_HARDIRQ
-        LOCK_USED_IN_HARDIRQ_READ
-        LOCK_USED_IN_SOFTIRQ
-        LOCK_USED_IN_SOFTIRQ_READ
+  LOCK_USED_IN_HARDIRQ
+  LOCK_USED_IN_HARDIRQ_READ
+  LOCK_USED_IN_SOFTIRQ
+  LOCK_USED_IN_SOFTIRQ_READ
 
 这个标记记录的是上锁的时候是否“曾经”在对应的状态过，具体的标记表示这个上下文当
 时的状态：::
 
-        . 状态关，非状态上下文（也可能就没有发生过）
-        - 状态关，状态上下文
-        + 状态开，非状态上下文
-        ? 状态开，状态上下文
+  . 状态关，非状态上下文（也可能就没有发生过）
+  - 状态关，状态上下文
+  + 状态开，非状态上下文
+  ? 状态开，状态上下文
 
 “状态”对应上面那四个上下文标记提到的中断状态，比如第一个标记是+，就表示hardirq
 开，非hardirq上下文。

@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2017-2019
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Understand Chinese -- Da De Jing Introduction
-***********************************************
 
 This is an introduction about Dao De Jing to some of my friends who speak
 English.
@@ -25,10 +20,8 @@ My English is quite limit. But fortunately, Dao De Jing is written in original
 Chinese character. It makes use of the original meaning of words. I don't need
 to know high level English culture and philosophy to explain to you and you
 don't need Chinese background either.
-
-
-Understand "Dao"
-================
+  
+## Understand "Dao"
 
 You may have already heard about "Dao" in other text which talks about Chinese
 culture. In many of this text, "Dao" is linked to some mysterious stuff, such
@@ -94,10 +87,8 @@ Dao.
 
 It is a theory of non-theory. Yes, it is still a theory, but you catch only
 its name as soon as you take it as a theory:)
-
-
-Understand De
-=============
+  
+## Understand De
 
 Dao De Jing is talking about Dao and De. (Jing means a classical book. For
 example, We call Bible as Sr. Jing in Chinese.)

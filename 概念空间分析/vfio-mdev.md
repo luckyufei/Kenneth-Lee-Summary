@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2017-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 vfio-mdev逻辑空间分析
-*********************
 
 最近评审了一个基于vfio-mdev的解决方案，发现该作者对这个逻辑空间的理解有问题，我
 通过本文来解释一下整个vfio逻辑空间是什么样的。
@@ -74,23 +69,23 @@ vfio_mdev驱动匹配，从而给用户态暴露一个普通vfio设备的接口�
 
 pdev注册需要提供如下参数：::
 
-        struct mdev_parent_ops {
-                struct module   *owner;
-                const struct attribute_group **dev_attr_groups;
-                const struct attribute_group **mdev_attr_groups;
-                struct attribute_group **supported_type_groups;
-                int     (*create)(struct kobject *kobj, struct mdev_device *mdev); 
-                int     (*remove)(struct mdev_device *mdev); 
-                int     (*open)(struct mdev_device *mdev); 
-                void    (*release)(struct mdev_device *mdev);
-                ssize_t (*read)(struct mdev_device *mdev, char __user *buf,
-                                size_t count, loff_t *ppos); 
-                ssize_t (*write)(struct mdev_device *mdev, const char __user *buf,
-                                 size_t count, loff_t *ppos);
-                long    (*ioctl)(struct mdev_device *mdev, unsigned int cmd, 
-                                 unsigned long arg);
-                int     (*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
-        };
+  struct mdev_parent_ops {
+  struct module   *owner;
+  const struct attribute_group **dev_attr_groups;
+  const struct attribute_group **mdev_attr_groups;
+  struct attribute_group **supported_type_groups;
+  int     (*create)(struct kobject *kobj, struct mdev_device *mdev); 
+  int     (*remove)(struct mdev_device *mdev); 
+  int     (*open)(struct mdev_device *mdev); 
+  void    (*release)(struct mdev_device *mdev);
+  ssize_t (*read)(struct mdev_device *mdev, char __user *buf,
+  size_t count, loff_t *ppos); 
+  ssize_t (*write)(struct mdev_device *mdev, const char __user *buf,
+  size_t count, loff_t *ppos);
+  long    (*ioctl)(struct mdev_device *mdev, unsigned int cmd, 
+  unsigned long arg);
+  int     (*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
+  };
 
 其中三个attribute_group都用于在sysfs中增加一组属性。device本身根据它的bus_type
 ，就会产生一个sysfs的属性组（所谓属性组就是sysfs中的一个目录，里面每个文件就是
@@ -117,7 +112,7 @@ supported_type_groups：/sys/bus/platform/devices/abc.0/mdev_supported_types/下
 1. devices：这是一个目录，链接向所有被创建的mdev
 
 2. create：向这个文件中写入一个uuid就可以创建一个新的mdev，实际上产生对
-   mdev_parent_ops.create()的回调
+  mdev_parent_ops.create()的回调
 
 mdev_parent_ops的其他回调，都是支持被pdev创建的mdev设备本身的文件访问的。对它的
 read/write/mmap本质上是对设备IO空间的访问，如果你要模拟一个platform设备，就要支

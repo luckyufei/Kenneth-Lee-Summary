@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2021
-
-:Authors: Kenneth Lee
-:Version: 2.0
-
+    
 UACCE as a General Heterogeneous Platform
-**********************************************
 
 More and more heterogeneous systems are introduced into the industries these
 days. Because CPU is indeed a good way to control rather than compute.

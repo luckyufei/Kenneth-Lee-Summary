@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 从内核终止用户态程序的IO访问
-****************************
 
 本文调查这个问题的解决方案：如果我暴露一个设备的IO空间给用户态的程序，这个设备
 出了异常，我如何可以终止用户态的程序，不让它继续访问这个设备。
@@ -43,17 +38,17 @@ SIGXXX, 1)，发一个信号给用户进程。但这是异步的，要等到用�
 
 用户进程的推荐算法如下：::
 
-        atomic_flag = 0
+  atomic_flag = 0
 
-        def sighandler():
-          if it_is_device_reset:
-              atomic_flag = 1
+  def sighandler():
+  if it_is_device_reset:
+  atomic_flag = 1
 
-        def device_loop():
-          fd = open(device)
-          mem = mmap(fd)
-          while atomic_flag:
-            device_io(mem)
-            close(fd)
+  def device_loop():
+  fd = open(device)
+  mem = mmap(fd)
+  while atomic_flag:
+  device_io(mem)
+  close(fd)
 
 这个方案应该比较保险了吧？

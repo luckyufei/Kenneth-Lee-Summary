@@ -1,5 +1,4 @@
 git submodule的理解
-********************
 
 今天和人讨论在某个方案中到底应该用Google的repo（Android中引入的那个）还是直接用
 git原生的submodule管理多个项目，我想对方可能并不理解submodule的设计逻辑是什么，
@@ -25,7 +24,7 @@ submodule的一个索引。比如你在board项目中add gcc作为一个submodul
 ，你只是增加了两个东西：
 
 1. 在board项目的根目录下增加了一个.gitmodule文件，里面包含了这个submodule的路径
-   在board项目的对象存储结构的根目录中
+  在board项目的对象存储结构的根目录中
 
 2. 增加了一个叫gcc的类型是commit的成员，记录gcc的HEAD sha1的对象索引
 
@@ -33,11 +32,11 @@ submodule的一个索引。比如你在board项目中add gcc作为一个submodul
 
 下面是add命令后board master分支的对象树的结构：::
 
-    kenny@kllt09:~/work/board$ git ls-tree master
-    100644 blob 31dbbaf60a542b4faf13582b770526ae37b0c094    .gitmodules
-    040000 tree fd44ee11cfbd6d111c918010c2206ff383a6bdcd    docs
-    160000 commit 60a6d6357708bd570c2fc3f27b5b27e8dab1befc  gcc
-    100644 blob 259b24152b284e29e86afadf714ddc3c2aa8dfe8    README
+  kenny@kllt09:~/work/board$ git ls-tree master
+  100644 blob 31dbbaf60a542b4faf13582b770526ae37b0c094    .gitmodules
+  040000 tree fd44ee11cfbd6d111c918010c2206ff383a6bdcd    docs
+  160000 commit 60a6d6357708bd570c2fc3f27b5b27e8dab1befc  gcc
+  100644 blob 259b24152b284e29e86afadf714ddc3c2aa8dfe8    README
 
 读者可以看到，这个gcc既不是一个tree（目录），也不是一个blob（文件），而是一个
 commit，它的sha就是我们加gcc的时候的HEAD。
@@ -51,7 +50,7 @@ commit，它的sha就是我们加gcc的时候的HEAD。
 1. 你的本地gcc submodule的HEAD发生了改变
 
 2. 你的board项目对象树中那个叫gcc的commit（的sha1）发生了改变（需要你主动在本地
-   commit，在这之前仅仅是index发生了更改）
+  commit，在这之前仅仅是index发生了更改）
 
 如果你push了你的board到主线，但没有push gcc到主线。那么其他人clone你的board主线
 ，那里会索引到一个新的gcc revision，但这个revision不在gcc的主线上，那么他就无法
@@ -79,7 +78,7 @@ push/pull和上游同步）。你事后也可以重新split这个目录（无论
 评论中另外有人提到monorepo。老实说，我是第一次听到这个说法，查了一下wiki，发现
 这不是一个软件，而是一种管理策略，简单定义如下：::
 
-    a software development strategy where code for many projects is stored in the same repository.
+  a software development strategy where code for many projects is stored in the same repository.
 
 我说明一下，我这里说的repo不是这个泛化的概念，而就是指AOSP（Android Open Source
 Poroject）中用到的repo脚本。但确实这个repo脚本是一种monorepo。

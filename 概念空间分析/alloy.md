@@ -1,12 +1,5 @@
-.. Kenneth Lee 版权所有 2022-2023
-
-:Authors: Kenneth Lee
-:Version: 1.3
-:Date: 2023-10-19
-:Status: Released
-
+        
 Alloy
-*****
 
 关键字：\ :index:`alloy`
 
@@ -18,24 +11,24 @@ Alloy
 1. 我本身要用这个工具，完成初步的学习自然要对它的整个逻辑建一次模。
 
 2. 学习这个东西对理解
-   :doc:`维特根斯坦的理论 <../逻辑哲学论分析/README>`
-   很有帮助，写出来可以作为那边的一个参考。
+  :doc:`维特根斯坦的理论 <../逻辑哲学论分析/README>`
+  很有帮助，写出来可以作为那边的一个参考。
 
 3. 学习这个东西对理解什么是
-   :doc:`软件架构设计 <../软件构架设计/README>`
-   很有帮助，写出来可以作为那边的一个参考。
+  :doc:`软件架构设计 <../软件构架设计/README>`
+  很有帮助，写出来可以作为那边的一个参考。
 
 本文组织上以第一个目的为主线，然后用下面的方式表示对维特根斯坦理论的讨论：
 
 .. note::
-     
-   这是对维特根斯坦理论的讨论。
+  
+  这是对维特根斯坦理论的讨论。
 
 用下面这种方式表示对软件架构设计理论的讨论：
 
 .. warning::
-     
-   这是对软件架构设计原理的讨论。
+  
+  这是对软件架构设计原理的讨论。
 
 Alloy是一个建模工具，它的主页在这里：
 `Alloy <https://www.csail.mit.edu/research/alloy>`_
@@ -53,11 +46,10 @@ Alloy的作者为这个工具写了一本书，叫《\ *Software Abstractions*\ 
 晕。本文会从程序员的角度通过澄清一些基本的概念来避免这个问题。而澄清这些基本概
 念，也有助于我们理解前面提到的逻辑哲学论和软件架构设计的思路。
 
-集合论基础
-==========
+## 集合论基础
 
-谓词逻辑
---------
+### 谓词逻辑
+
 
 Alloy作者写的那本书，如果没有集合论的基础，是比较难看懂的。因为对于集合论已经定
 义的概念，包括保留字，作者都是不解释的。对于没有学过或者已经把集合论还给老师的
@@ -90,17 +82,17 @@ Set Theroy》或者类似的英文教材（因为用语都是英文的，中文�
 
 .. note::
 
-   从谓词逻辑理解维特根斯坦的理论会很简单，一旦你用上文这个方法来理解逻辑，你
-   很自然就会理解什么是维特根斯坦反复提及的Can be said clearly和Must Be Passed
-   Over In Silence了：存在x属于集合A，使得f(x)成立，这是逻辑，是Can be said
-   clearly的。而某个x是否有四条腿，什么是四条腿，这个事情每个人理解都不一样，
-   这就只能“你知我知”，就是只能Must Be Passed Over In Silence了。
+  从谓词逻辑理解维特根斯坦的理论会很简单，一旦你用上文这个方法来理解逻辑，你
+  很自然就会理解什么是维特根斯坦反复提及的Can be said clearly和Must Be Passed
+  Over In Silence了：存在x属于集合A，使得f(x)成立，这是逻辑，是Can be said
+  clearly的。而某个x是否有四条腿，什么是四条腿，这个事情每个人理解都不一样，
+  这就只能“你知我知”，就是只能Must Be Passed Over In Silence了。
 
-   这也是《道德经》中的名和道的区别，名就是你已经总结的逻辑元素，它来自集合的分
-   割方法（把什么定义为“集合内”，就是有；把什么定义为“集合外”，就是无）。而“道”
-   是被分割的那个全集，那个东西也是只能Passed Over In Silence。所以，“道”才不可
-   “道”。因为一旦“道”出来，那就是“名”了。就必然是个抽象，就必然是个脑子中的数字
-   孪生，而不能完全代表我们希望描述的那个东西了。
+  这也是《道德经》中的名和道的区别，名就是你已经总结的逻辑元素，它来自集合的分
+  割方法（把什么定义为“集合内”，就是有；把什么定义为“集合外”，就是无）。而“道”
+  是被分割的那个全集，那个东西也是只能Passed Over In Silence。所以，“道”才不可
+  “道”。因为一旦“道”出来，那就是“名”了。就必然是个抽象，就必然是个脑子中的数字
+  孪生，而不能完全代表我们希望描述的那个东西了。
 
 基于谓词逻辑，我们对于每件事的叙述（比如“x有四条腿”），都是一种范围的收缩。都构
 成一个集合。
@@ -119,48 +111,48 @@ Set Theroy》或者类似的英文教材（因为用语都是英文的，中文�
 bit）。用计算机的单位，这是1M的信息。如果和Alloy一样，我们承认自己可以和自己有
 关系，那这是25个bit，总共512M bits的关系。
 
-        注：有读者觉得这个地方好像用不了这么大的信息空间，而觉得只有5个对象，每
-        个是否和其他对象是否有关系，所以只有5×5种情况。这个理解是不对的。每个对
-        象你不是只选择其中一个作为关联，而是和每个是否发生关联都是不同的情况。
+  注：有读者觉得这个地方好像用不了这么大的信息空间，而觉得只有5个对象，每
+  个是否和其他对象是否有关系，所以只有5×5种情况。这个理解是不对的。每个对
+  象你不是只选择其中一个作为关联，而是和每个是否发生关联都是不同的情况。
 
-        看看下面这幅图就明白了：
+  看看下面这幅图就明白了：
 
-        .. figure:: _static/rel_world.svg
+  .. figure:: _static/rel_world.svg
 
 .. note::
 
-   实际这里为了简化问题，我们忽略了给“关系”本身命名包含的信息，比如我们忽略了
-   “苹果是梨子的母亲”中母亲这个信息，我们只关心了苹果具有梨子这个属性这一个信息。
-   所以，现实中的名字关系引起的集合运算其实更复杂一些。但Alloy忽略这个信息也是
-   有道理的，因为其实在Alloy所推演的世界中，我们推演是是苹果和梨子有关系，我们
-   不关心这个关系叫做“母亲”，苹果和梨子“有（某种）关系”这个事实决定了我们的推理
-   结果，不是“母亲”的语义决定了我们的推理结果。换句话说，你不说苹果是梨子的母亲，
-   而说苹果是梨子的大狗，这毫不影响我们的结果。如果你确实要把母亲代表的其他语义
-   放到模型中，就要建立更多的“关系”来表达它的不同。
+  实际这里为了简化问题，我们忽略了给“关系”本身命名包含的信息，比如我们忽略了
+  “苹果是梨子的母亲”中母亲这个信息，我们只关心了苹果具有梨子这个属性这一个信息。
+  所以，现实中的名字关系引起的集合运算其实更复杂一些。但Alloy忽略这个信息也是
+  有道理的，因为其实在Alloy所推演的世界中，我们推演是是苹果和梨子有关系，我们
+  不关心这个关系叫做“母亲”，苹果和梨子“有（某种）关系”这个事实决定了我们的推理
+  结果，不是“母亲”的语义决定了我们的推理结果。换句话说，你不说苹果是梨子的母亲，
+  而说苹果是梨子的大狗，这毫不影响我们的结果。如果你确实要把母亲代表的其他语义
+  放到模型中，就要建立更多的“关系”来表达它的不同。
 
-   《道德经》中把这形容为：玄之又玄。具体的说法是：（有无）同谓之玄（有无的分
-   割是玄），玄之又玄（分割上再交叉分割），众妙之门（所有概念原理的入口）。
-   《道德经》更关心的不是你的名字以及名字之间的关系，它更关心名字是怎么被提取
-   出来的，所以道德经讨论的是一个变化的逻辑世界。而自然哲学论讨论的是一个静态
-   的逻辑世界。
+  《道德经》中把这形容为：玄之又玄。具体的说法是：（有无）同谓之玄（有无的分
+  割是玄），玄之又玄（分割上再交叉分割），众妙之门（所有概念原理的入口）。
+  《道德经》更关心的不是你的名字以及名字之间的关系，它更关心名字是怎么被提取
+  出来的，所以道德经讨论的是一个变化的逻辑世界。而自然哲学论讨论的是一个静态
+  的逻辑世界。
 
 这构成我们这个理解的“世界”的全集。我们增加的认识，都是对这个全集的一个收缩。
 
 .. note::
 
-   如果你看不懂维特根斯坦说的“World”的概念，不明白他说的World的特性为什么会这么
-   奇怪，回来看看集合论的概念，你就会发现其实他说得很直白了：他说的World，并不
-   是我们以为我们认识了的那个世界，而是真正的世界在我们头脑中的那个“数字孪生”，
-   是抛弃了Pass Over In Silence而剩下的那个数字建模。缺乏哲学思维的人总是把两者
-   等同，但其实你的数字孪生是对真实世界的一个抽象和建模，并不包含所有的信息。
+  如果你看不懂维特根斯坦说的“World”的概念，不明白他说的World的特性为什么会这么
+  奇怪，回来看看集合论的概念，你就会发现其实他说得很直白了：他说的World，并不
+  是我们以为我们认识了的那个世界，而是真正的世界在我们头脑中的那个“数字孪生”，
+  是抛弃了Pass Over In Silence而剩下的那个数字建模。缺乏哲学思维的人总是把两者
+  等同，但其实你的数字孪生是对真实世界的一个抽象和建模，并不包含所有的信息。
 
-   用“五行相克”你也可以解释你看到的真实世界的信息，“生产力改变生产关系”你也可以
-   解释这些信息，用“系统动力循环”同样可以解释这些信息，每个不同的建模会导向完全
-   不同的结论。但真实世界永远按它的规律走，不因为你用了不同的方法去“名”（建模）
-   它而有所改变。
+  用“五行相克”你也可以解释你看到的真实世界的信息，“生产力改变生产关系”你也可以
+  解释这些信息，用“系统动力循环”同样可以解释这些信息，每个不同的建模会导向完全
+  不同的结论。但真实世界永远按它的规律走，不因为你用了不同的方法去“名”（建模）
+  它而有所改变。
 
-   理解这一点，《道德经》里面的道和名也就很好理解了。道就是外部影响你的认知的那
-   个东西（维特根斯坦把这叫做“Thing”），而名，就是你脑子里面的“数字孪生”。
+  理解这一点，《道德经》里面的道和名也就很好理解了。道就是外部影响你的认知的那
+  个东西（维特根斯坦把这叫做“Thing”），而名，就是你脑子里面的“数字孪生”。
 
 好了，现在如果我们说：苹果是红色的（你不用管这是不是事实，我们现在谈的是我们脑
 子中理解的那个世界）。那么前面这个集合就变小了，因为苹果必须和红色发生关联，苹
@@ -184,25 +176,25 @@ bit）。用计算机的单位，这是1M的信息。如果和Alloy一样，我�
 
 .. warning::
 
-   从这个角度，也许更容易让我们理解设计是什么了：你有一个客观世界，你对它有期望，
-   这个期望在一个范围里面（假定叫T）。你可以通过控制你可以控制的东西，对这个世
-   界进行限制，得到一组范围限定A1，A2，A3，...，这组我们设计的An能够包住现实制
-   造的限制Bn。我们希望达成的目的是：A1交或者并A2交或者并A3...是T的子集。
+  从这个角度，也许更容易让我们理解设计是什么了：你有一个客观世界，你对它有期望，
+  这个期望在一个范围里面（假定叫T）。你可以通过控制你可以控制的东西，对这个世
+  界进行限制，得到一组范围限定A1，A2，A3，...，这组我们设计的An能够包住现实制
+  造的限制Bn。我们希望达成的目的是：A1交或者并A2交或者并A3...是T的子集。
 
-   这就是为什么我们描述T和定义A1, A2, A3在满足要求的时候让自由度尽量大，因为这
-   样我们在面对Bn造成的实际限制的时候，我们的设计目的可以达成的机会就会更大。
+  这就是为什么我们描述T和定义A1, A2, A3在满足要求的时候让自由度尽量大，因为这
+  样我们在面对Bn造成的实际限制的时候，我们的设计目的可以达成的机会就会更大。
 
-   我们做构架设计，都是为了解决这个问题。我们根据我们对Bn的理解，控制我们可以控
-   制的An，保证我们最终得到的系统在T的范围内。
+  我们做构架设计，都是为了解决这个问题。我们根据我们对Bn的理解，控制我们可以控
+  制的An，保证我们最终得到的系统在T的范围内。
 
-     .. figure:: _static/design.svg
+  .. figure:: _static/design.svg
 
 发明了这个理论以后，数学家开始对各种数学理论都进行了“标准化”（Formalization），
 保证它们都是基于一组基本的公理（范围定义）和集合运算来描述的。这个努力开始没多
 久……就数学危机了。
 
-罗素悖论
---------
+### 罗素悖论
+
 
 因为这样泛化以后，人们发现了一堆的悖论。最著名的当然是小学数学爱好者都听说过的
 “罗素悖论”：理发师说他只给村子里的不给自己理发的人理发。然后我们问：理发师是否
@@ -223,8 +215,8 @@ Dedekind的逻辑，所有集合都用集合从空集开始构建的，这个自
 
 .. math::
 
-   \exists x:A \mid P(x) \\
-   \forall x:A \mid P(x)
+  \exists x:A \mid P(x) \\
+  \forall x:A \mid P(x)
 
 这种定义方法保证了，x只能被分别限制范围，而不能被循环定义：你先用A集合约束x的范
 围，然后用P又收缩它（x）的范围。但你不能拿A本身去当作P的变量来做范围判定。
@@ -236,8 +228,8 @@ Dedekind的逻辑，所有集合都用集合从空集开始构建的，这个自
 这种定义方法在变量前面加上了x的取值范围的约束符，被称为量词。所以谓词逻辑，又称
 为“量词逻辑”（Quantification Logic），强调的就是前面这个量词的必要性。
 
-贝尔悖论
---------
+### 贝尔悖论
+
 
 另一个经典悖论是“Barry悖论”，又称为语义悖论。它的一个具体描述是这样的：假定有一
 本固定单词数量的英语字典。我们定义集合Q是这本英语字典的20个单词以内可以表达的所
@@ -261,24 +253,24 @@ Q有一个最大值。那么，我们可以用英语说：“比Q的最大值大
 
 .. warning::
 
-   这个问题在我们的设计中经常出现。比如我说，我要做一个编辑器。让你做第一层设
-   计，你制造这样一个限制：做一个在Linux上运行的编辑器。这是不是一种设计呢？可
-   以说是，因为它确实收窄了范围。但这个设计到这个程度行不行呢？我看是不行，因
-   为它太“大”了，我们无法判断它是不是一个伪命题。
+  这个问题在我们的设计中经常出现。比如我说，我要做一个编辑器。让你做第一层设
+  计，你制造这样一个限制：做一个在Linux上运行的编辑器。这是不是一种设计呢？可
+  以说是，因为它确实收窄了范围。但这个设计到这个程度行不行呢？我看是不行，因
+  为它太“大”了，我们无法判断它是不是一个伪命题。
 
-   这个例子太极端，我们看一个更细节的。比如有人设计一个CPU的中断处理单元，他说：
-   “CPU收到中断以后，如果现在被关闭了，CPU就不收这个消息，后面的消息设备也不要
-   报上来了……”，这种就是“大”了，没法实施。它是一种上帝视角，CPU收到中断以后，决
-   定自己如何做，只能从自己的角度出发，它代表不了所有人，你可以说，你自己的中断
-   单元设置为“不收中断”时，你直接丢弃这个中断，或者你自己决定缓存这个中断。但如
-   果你说的是“不收这个中断，设备也不要报过来了”，这个定义的要求就太大了，它只能
-   用做意图，不能用作“设计”。
+  这个例子太极端，我们看一个更细节的。比如有人设计一个CPU的中断处理单元，他说：
+  “CPU收到中断以后，如果现在被关闭了，CPU就不收这个消息，后面的消息设备也不要
+  报上来了……”，这种就是“大”了，没法实施。它是一种上帝视角，CPU收到中断以后，决
+  定自己如何做，只能从自己的角度出发，它代表不了所有人，你可以说，你自己的中断
+  单元设置为“不收中断”时，你直接丢弃这个中断，或者你自己决定缓存这个中断。但如
+  果你说的是“不收这个中断，设备也不要报过来了”，这个定义的要求就太大了，它只能
+  用做意图，不能用作“设计”。
 
-   不过，这个主要还是个度的问题，是我们经验上说这个“约束”是不是有信心可以直接执
-   行的。在数学上，我们很容易定义这个度，但工程上，我们只能靠意会了，一个只有5
-   个对象的模型，都要1M的数据来建模推理空间，我们做一个软件，状态成千上万，乃至
-   上百万，上千万，你不可能像数学那样推演。所以，大部分时候我们都只能Pass Over
-   In Silence。但无论如何，我们认为原理是一样的。
+  不过，这个主要还是个度的问题，是我们经验上说这个“约束”是不是有信心可以直接执
+  行的。在数学上，我们很容易定义这个度，但工程上，我们只能靠意会了，一个只有5
+  个对象的模型，都要1M的数据来建模推理空间，我们做一个软件，状态成千上万，乃至
+  上百万，上千万，你不可能像数学那样推演。所以，大部分时候我们都只能Pass Over
+  In Silence。但无论如何，我们认为原理是一样的。
 
 无论如何吧，消除了这些悖论以后，我们就只剩下了谓词，以及所有的集合运算：
 
@@ -298,22 +290,21 @@ Q有一个最大值。那么，我们可以用英语说：“比Q的最大值大
 准来描述（因为工程成本实在是太高了），只是说，我们有了这样一个标准，当我们遇到
 在理解上有分歧的地方，我们可以随时细化到这个程度，来消除这种分歧。::
 
-        Thus mathemticians are usually content to satisfy themselves that an
-        axiomatic theory can be formalized, and then proceed to develop it in
-        an informal manner.
+  Thus mathemticians are usually content to satisfy themselves that an
+  axiomatic theory can be formalized, and then proceed to develop it in
+  an informal manner.
 
-                                                         -- Charles
+  -- Charles
 
 .. warning::
 
-   这也是为什么，在工程上，我们更多还是用命题逻辑来描述和推理我们的设计，只有在
-   空间足够小，组合足够多的地方（比如我们后面会举的内存序的例子），我们才会用严
-   格的谓词逻辑来进行有限度的推理。因为后者的工程成本通常不是人类现有（可能永远
-   都不会有）的方法可以承载的。
+  这也是为什么，在工程上，我们更多还是用命题逻辑来描述和推理我们的设计，只有在
+  空间足够小，组合足够多的地方（比如我们后面会举的内存序的例子），我们才会用严
+  格的谓词逻辑来进行有限度的推理。因为后者的工程成本通常不是人类现有（可能永远
+  都不会有）的方法可以承载的。
+  
+### 绑定和自由变量
 
-
-绑定和自由变量
---------------
 
 量词在谓词逻辑中是个很不好处理的东西，因为它没法直接参与一般的集合运算，所以通
 常需要很多特殊的手法来处理。在Alloy这种建模语言中，一种很常用的算法是Skolem提出
@@ -329,12 +320,12 @@ Q有一个最大值。那么，我们可以用英语说：“比Q的最大值大
 
 .. math::
 
-   \exists a \mid P(a, b)
+  \exists a \mid P(a, b)
 
 a是bound的，b是free的。free的变量在计算的时候不会对结果产生约束。对于被“存在”绑
 定的量词逻辑描述，可以通过Skolemization方法转换成普通的集合运算。比如：::
 
-   \exists x: A \mid R(x)
+  \exists x: A \mid R(x)
 
 可以转化成：::
 
@@ -354,11 +345,11 @@ Alloy）通过这种方法把所有的定义转换成纯粹的集合运算，从
 
 .. math::
 
-   (1) {\forall x \mid P(x)} \iff {!\exists x \mid !P(x)}
+  (1) {\forall x \mid P(x)} \iff {!\exists x \mid !P(x)}
 
 .. math::
 
-   (2) {\exists x \mid P(x) } \iff {!\forall x \mid !P(x)}
+  (2) {\exists x \mid P(x) } \iff {!\forall x \mid !P(x)}
 
 关联
 ----
@@ -424,26 +415,25 @@ Partition可以是：{{a, b, c}, {d}, {e}}。
 
 .. warning::
 
-   这些理论和我们平时做设计的理念几乎是一一对应的。比如我们做高层概念建模，本质
-   上就是先用一个Partitions，把问题进行分类，然后在每个分类中进行细化。所以如果
-   高层设计不构成一个Partition，那么你在细节设计中做的再好，结果可能都是错（有
-   漏洞）的。
+  这些理论和我们平时做设计的理念几乎是一一对应的。比如我们做高层概念建模，本质
+  上就是先用一个Partitions，把问题进行分类，然后在每个分类中进行细化。所以如果
+  高层设计不构成一个Partition，那么你在细节设计中做的再好，结果可能都是错（有
+  漏洞）的。
 
-   而如果你的高层设计没有partition好，下层设计就需要在同一个子集中解决相同的问
-   题，这个成本就可能无限增大，最终问题就不可解决了。而如果你的子设计不是上一层
-   Parition的Refine，那么你上一层的设计也没有任何意义。我们不少人写设计文档，上
-   一层按UML的要求画一堆的图，下一层按代码的要求写一堆的类，两者的边界却是交叉
-   的，这种就会变成形式主义，就相当于没有设计了。更糟糕的是，无论哪层设计都不是
-   针对某个全集的Partition，留下一堆的漏洞，这种设计就更没有意义了。
+  而如果你的高层设计没有partition好，下层设计就需要在同一个子集中解决相同的问
+  题，这个成本就可能无限增大，最终问题就不可解决了。而如果你的子设计不是上一层
+  Parition的Refine，那么你上一层的设计也没有任何意义。我们不少人写设计文档，上
+  一层按UML的要求画一堆的图，下一层按代码的要求写一堆的类，两者的边界却是交叉
+  的，这种就会变成形式主义，就相当于没有设计了。更糟糕的是，无论哪层设计都不是
+  针对某个全集的Partition，留下一堆的漏洞，这种设计就更没有意义了。
 
 我们这里主要点了一些关键的概念，以便读者在后面看Alloy相关的东西，想起这些东西都
 是集合论中的。其他的细节，比如，定义，公理，定理，推论等等，还是看正式的教材吧。
 
-把集合论逻辑对应到Alloy
-=======================
+## 把集合论逻辑对应到Alloy
 
-Alloy的概念模型
----------------
+### Alloy的概念模型
+
 
 Alloy基本上是和集合论和一阶谓词逻辑的概念是一一对应的。每个Alloy的源代码，主要
 是定义一个全集空间，然后用集合语言进行范围搜索，然后和一些意图定义的范围进行匹
@@ -476,9 +466,9 @@ Alloy认为所有成员都是univ的组成部分，Fruit只是univ中的其中�
 
 .. note::
 
-   自然哲学论中说，定义一个对象的只有它的属性。这里的例子能让你很容易让你理解这
-   一点：这里的Apple你换成Epple或者Green对你的推理没有任何影响，逻辑不在名字和
-   名字本来的意义上，推理只认关系，其他一概不知。
+  自然哲学论中说，定义一个对象的只有它的属性。这里的例子能让你很容易让你理解这
+  一点：这里的Apple你换成Epple或者Green对你的推理没有任何影响，逻辑不在名字和
+  名字本来的意义上，推理只认关系，其他一概不知。
 
 sig可以继承，比如这样：::
 
@@ -494,15 +484,15 @@ JuicyFruit。如果你希望这种情况不存在，所有的Fruit，要不是Ju
 只属于它的Atom。这些都是平坦的集合的概念。和编程语言一般意义的类和内存的关系是
 不同的。
 
-        注：sig还有很多集合规则，比如，每个独立定义的sig默认和其他sig正交
-           （disjoin），所以，我们这里认为JuicyFruit和TastyFruit没有交集。
-           但你又可以这样定义集合：::
+  注：sig还有很多集合规则，比如，每个独立定义的sig默认和其他sig正交
+  （disjoin），所以，我们这里认为JuicyFruit和TastyFruit没有交集。
+  但你又可以这样定义集合：::
 
-              sig MyFruitCollection in JuicyFruit + TastyFruit {}
+  sig MyFruitCollection in JuicyFruit + TastyFruit {}
 
-           这个MyFruitCollection就可以和其他集合有交集。所以，这里还有很多其他
-           的细节，但因为我们这里不是重复手册，而是介绍概念空间，这种细节留给读
-           者自己去看手册吧。
+  这个MyFruitCollection就可以和其他集合有交集。所以，这里还有很多其他
+  的细节，但因为我们这里不是重复手册，而是介绍概念空间，这种细节留给读
+  者自己去看手册吧。
 
 正如我们在前面的说谈集合论的里面说，在集合的角度，“属性”不过是一种关联。所以，
 如果我们要表达“水果的颜色”，这最终表达的是水果的集合元素和颜色的集合元素的关联。
@@ -521,10 +511,10 @@ JuicyFruit。如果你希望这种情况不存在，所有的Fruit，要不是Ju
 
 .. note::
 
-   理解这个概念，你就可以理解维特根斯坦在自然哲学论里面要反复强调所有属性其实是
-   一种空间概念（本质是几何空间的线性关联），为什么说所有对象都是没有颜色的，为
-   什么说两个对象如果所有属性都一样，那么它们的唯一区别是它们有一个“它们是不一
-   样的”属性，等等这些要素了。
+  理解这个概念，你就可以理解维特根斯坦在自然哲学论里面要反复强调所有属性其实是
+  一种空间概念（本质是几何空间的线性关联），为什么说所有对象都是没有颜色的，为
+  什么说两个对象如果所有属性都一样，那么它们的唯一区别是它们有一个“它们是不一
+  样的”属性，等等这些要素了。
 
 那么Fruit.col是什么意思呢？这表示用Fruit这个集合，去作为col的定义域（domain），
 求它的值域。所以，最终你得到的是所有的Fruit的可能的所有颜色。如果你的JuicyFruit
@@ -537,22 +527,22 @@ JuicyFruit。如果你希望这种情况不存在，所有的Fruit，要不是Ju
 
 .. warning::
 
-   在架构设计中，我们经常会遇到这种情况：某个数据结构，封装在什么地方，我们觉得
-   它们是不可移动的，但其实从逻辑或者信息论的角度，信息在世界中存在，是因为那个
-   问题存在，信息本身是可以藏身在任何一个地方的。一个中断调度到什么CPU上，可以
-   呈现为中断发送者上的一个目标选择，可以呈现为中断控制器的路由，也可以呈现为
-   CPU是否接受这个中断。但中断必须发给一个CPU，这个信息，在整个“世界”中，总是存
-   在的，我们应该考虑的是把它放在什么地方，而不是认为某个对象中没有它了，问题就
-   可以不存在。Alloy的模型，因为总从一个全集上看待问题，可以让我们更轻易看清楚
-   这一点。所以，其实无论你是不是用Alloy来建模，学习类似工具的原理，对做好架构
-   设计来说，都有很大的收益。
+  在架构设计中，我们经常会遇到这种情况：某个数据结构，封装在什么地方，我们觉得
+  它们是不可移动的，但其实从逻辑或者信息论的角度，信息在世界中存在，是因为那个
+  问题存在，信息本身是可以藏身在任何一个地方的。一个中断调度到什么CPU上，可以
+  呈现为中断发送者上的一个目标选择，可以呈现为中断控制器的路由，也可以呈现为
+  CPU是否接受这个中断。但中断必须发给一个CPU，这个信息，在整个“世界”中，总是存
+  在的，我们应该考虑的是把它放在什么地方，而不是认为某个对象中没有它了，问题就
+  可以不存在。Alloy的模型，因为总从一个全集上看待问题，可以让我们更轻易看清楚
+  这一点。所以，其实无论你是不是用Alloy来建模，学习类似工具的原理，对做好架构
+  设计来说，都有很大的收益。
 
 无论属性还是数组，在集合论中都是关联的集合，所以，本质上，col是一个集合到集合的
 关联，可以表示成col: Fruid->Color。这是一个二元关联（Binary），Alloy可以支持多
 元的关联，比如：::
 
   sig MyFruitCollection {
-    myfruit: Fruit->Color
+  myfruit: Fruit->Color
   }
 
 这就是一个三元关联（Ternary）：MyFruitCollection->Fruit->Color。实际上，Alloy把
@@ -572,7 +562,7 @@ one是这个关联针对Color的量词。这表示说，col是Fruit到Color的1�
 你也可以这样说：::
 
   fact OneColor { 
-    all x: Fruit | #x.col = 1
+  all x: Fruit | #x.col = 1
   }
 
 这同样在限制范围：对于任何一个Fruit的成员x，x.col的数量正好等于1。说起来，理解
@@ -592,33 +582,33 @@ one是这个关联针对Color的量词。这表示说，col是Fruit到Color的1�
 .. code-block:: none
 
   abstract sig Person {
-    father: lone Man,
-    mother: lone Woman
+  father: lone Man,
+  mother: lone Woman
   }
   sig Man extends Person {
-    wife: lone Woman
+  wife: lone Woman
   }
   sig Woman extends Person {
-    husband: lone Man
+  husband: lone Man
   }
   fact Biology {
-    no p: Person | p in p.^(mother + father)
+  no p: Person | p in p.^(mother + father)
   }
   fact Terminology {
-    wife = ~husband
+  wife = ~husband
   }
   fact SocialConvention {
-    no (wife + husband) & ^(mother + father)
+  no (wife + husband) & ^(mother + father)
   }
   assert NoSelfFather {
-    no m: Man | m = m.father
+  no m: Man | m = m.father
   }
   check NoSelfFather
   fun grandpas (p: Person): set Person {
-    let parent = mother + father + father.wife +mother.husband | p.parent.parent & Man
+  let parent = mother + father + father.wife +mother.husband | p.parent.parent & Man
   }
   pred ownGrandpa (p: Man) {
-    p in grandpas [p]
+  p in grandpas [p]
   }
   run ownGrandpa for 4
 
@@ -639,13 +629,13 @@ fact
 .. code-block:: none
 
   fact Biology {
-    no p: Person | p in p.^(mother + father)
+  no p: Person | p in p.^(mother + father)
   }
   fact Terminology {
-    wife = ~husband
+  wife = ~husband
   }
   fact SocialConvention {
-    no (wife + husband) & ^(mother + father)
+  no (wife + husband) & ^(mother + father)
   }
 
 第一个fact Biology从“生物性”上约束我们的集合，它定义：不存在Person p（“不存在”
@@ -686,38 +676,38 @@ father的两人不能是夫妻”。
 我强调这一点，是想说：
 
 1. 不能认为模型就代表你建模的那个对象了，你只是在一个你构想的世界里面用你的认知
-   来对这个世界的逻辑进行预判而已。
+  来对这个世界的逻辑进行预判而已。
 
 2. 我们头脑对世界的全部认识其实本质也是这样一个模型（只是更大，而且很多时候没有
-   进行过完整的穷举），Can be said clearly的东西也只是Can be said而已，不代表事
-   实。但我们用这种方法弄清楚我们的大脑在进行决策的时候，是根据什么认知的判断来
-   得到结果的。
+  进行过完整的穷举），Can be said clearly的东西也只是Can be said而已，不代表事
+  实。但我们用这种方法弄清楚我们的大脑在进行决策的时候，是根据什么认知的判断来
+  得到结果的。
 
 .. warning::
 
-   在我的架构设计的经验中，经常发现工程师会被已经有的定义的名字左右了自己对问题
-   的认识。他们觉得指令就只能有RISC和CSCI，觉得中断就必须有电平中断和边缘触发中
-   断，觉得链表就只能是用指针构造的……从谓词逻辑建模这个角度，你会发现，这种思想
-   给自己增加了无数多余的约束，让自己损失了大量的设计自由度。
+  在我的架构设计的经验中，经常发现工程师会被已经有的定义的名字左右了自己对问题
+  的认识。他们觉得指令就只能有RISC和CSCI，觉得中断就必须有电平中断和边缘触发中
+  断，觉得链表就只能是用指针构造的……从谓词逻辑建模这个角度，你会发现，这种思想
+  给自己增加了无数多余的约束，让自己损失了大量的设计自由度。
 
-   举个真实的例子：有人做一个CPU复位的功能，CPU复位这个问题在“关联”的角度来说，
-   本质就是你要求给CPU供电的系统把电给它关上在打开就好了。这是是这个问题的最小
-   约束。那我们对这个问题的最小切割就应该是，我们有一个外设（供电系统），CPU要给
-   一个外设发一个请求，实现对自己（或者其他CPU核）作出一次关-开电的行为吧。一旦
-   我们这样切割问题，我们的解决方案就很简单：供电系统开一个IO接口给CPU，CPU对这
-   个IO接口发请求就好了。这是一个好的切割。但这位工程师觉得自己是在操作系统内核
-   中发出一个请求，所以这是一个针对BIOS的调用，需要首先实现BIOS的服务，然后由
-   BIOS请求CPU给其他CPU发IPI，然后那些CPU响应这个IPI，复位自己……这些考量每个都
-   不能说没有道理（因为现在有些平台是这么做的），但它们都有额外的驱动力：比如内
-   核没有权限发起复位，所以需要通过BIOS发起；每个核不能复位其他核，只能复位自己。
-   但这些条件在你的平台上也成立吗？为什么你一听到“复位”这个名字，就觉得你需要做
-   现在已知平台的一切要求呢？因为你总是活在别人的架构设计中，被别人定义的名字左
-   右了你的设计范围。但用这种办法做构架设计，你永远都无法竞争过对手，因为你同时
-   背上了你自己的，和别人才需要背上的全部约束。这是戴上鐐拷跳舞，你永远都跳不赢
-   别人啊。
+  举个真实的例子：有人做一个CPU复位的功能，CPU复位这个问题在“关联”的角度来说，
+  本质就是你要求给CPU供电的系统把电给它关上在打开就好了。这是是这个问题的最小
+  约束。那我们对这个问题的最小切割就应该是，我们有一个外设（供电系统），CPU要给
+  一个外设发一个请求，实现对自己（或者其他CPU核）作出一次关-开电的行为吧。一旦
+  我们这样切割问题，我们的解决方案就很简单：供电系统开一个IO接口给CPU，CPU对这
+  个IO接口发请求就好了。这是一个好的切割。但这位工程师觉得自己是在操作系统内核
+  中发出一个请求，所以这是一个针对BIOS的调用，需要首先实现BIOS的服务，然后由
+  BIOS请求CPU给其他CPU发IPI，然后那些CPU响应这个IPI，复位自己……这些考量每个都
+  不能说没有道理（因为现在有些平台是这么做的），但它们都有额外的驱动力：比如内
+  核没有权限发起复位，所以需要通过BIOS发起；每个核不能复位其他核，只能复位自己。
+  但这些条件在你的平台上也成立吗？为什么你一听到“复位”这个名字，就觉得你需要做
+  现在已知平台的一切要求呢？因为你总是活在别人的架构设计中，被别人定义的名字左
+  右了你的设计范围。但用这种办法做构架设计，你永远都无法竞争过对手，因为你同时
+  背上了你自己的，和别人才需要背上的全部约束。这是戴上鐐拷跳舞，你永远都跳不赢
+  别人啊。
 
-Assert
-------
+### Assert
+
 
 断言是Alloy的“应用”，前面的sig和fact定义世界的基本边界，而assert是让Alloy在剩下
 的空间中找一个反例，如果找不到，assert就成立，否则告诉你，你原来定义的空间里面，
@@ -728,15 +718,15 @@ Assert的语法像下面这样：
 .. code-block:: none
 
   assert NoSelfFather {
-    no m: Man | m = m.father
+  no m: Man | m = m.father
   }
   check NoSelfFather
 
 这里检查：在前面的条件下，是否我们可以认为“没人会成为自己的父亲”。Alloy尝试找一
 个反例，让它符合前面的所有要求，但不满足assert定义的范围。
 
-Predicate
----------
+### Predicate
+
 
 check找反例，而run负责找正例，找一个满足条件的解。这个条件，通过Predicate来声明。
 语法像下面这样：
@@ -744,10 +734,10 @@ check找反例，而run负责找正例，找一个满足条件的解。这个条
 .. code-block:: none
 
   fun grandpas (p: Person): set Person {
-    let parent = mother + father + father.wife +mother.husband | p.parent.parent & Man
+  let parent = mother + father + father.wife +mother.husband | p.parent.parent & Man
   }
   pred ownGrandpa (p: Man) {
-    p in grandpas [p]
+  p in grandpas [p]
   }
   run ownGrandpa for 4
 
@@ -819,8 +809,8 @@ add前后的状态而已。
   pred add (b, b’: Book, n: Name, t: Target) {b’.addr = b.addr + n -> t}
   pred del (b, b’: Book, n: Name, t: Target) {b’.addr = b.addr - n -> t}
   assert delUndoesAdd {
-    all b,b’,b“: Book, n: Name, t: Target | no n.(b.addr) and
-    add [b,b’,n,t] and del [b’,b”,n, t] implies b.addr = b“.addr
+  all b,b’,b“: Book, n: Name, t: Target | no n.(b.addr) and
+  add [b,b’,n,t] and del [b’,b”,n, t] implies b.addr = b“.addr
   }
   check delUndoesAdd for 3
 
@@ -835,9 +825,9 @@ add前后的状态而已。
 
 .. warning::
 
-   这个认识，明确告诉我们：架构设计是一种艺术，是对问题的抽象和角度的问题，没有
-   办法通过“生产线”，“标准化”，“Checklist”的方法来完成。它是发明生产线，决定标
-   准化，制造Chechlist的方法本身。
+  这个认识，明确告诉我们：架构设计是一种艺术，是对问题的抽象和角度的问题，没有
+  办法通过“生产线”，“标准化”，“Checklist”的方法来完成。它是发明生产线，决定标
+  准化，制造Chechlist的方法本身。
 
 调试
 ====
@@ -859,7 +849,7 @@ add前后的状态而已。
   杂度，你就知道，靠人脑是没有办法穷举所有的可能性的，你只能基于命题逻辑来“想象”
   你的结论是否正确：
 
-        .. figure:: _static/rvwmo-model.jpg
+  .. figure:: _static/rvwmo-model.jpg
 
 但我们可以通过对每个特定的解对我们的模型进行修正。我举个例子，比如我要定义一个序列，
 我开始可以这样定义：
@@ -867,10 +857,10 @@ add前后的状态而已。
 .. code-block:: none
 
   sig Num {
-    n: disj lone Num
+  n: disj lone Num
   }
   pred Test {
-    #Num > 4
+  #Num > 4
   }
   run Test for 8
 
@@ -885,7 +875,7 @@ add前后的状态而已。
 .. code-block:: none
 
   fact Sequence {
-    no iden & ^n
+  no iden & ^n
   }
 
 再运行我们得到这个解：
@@ -910,9 +900,9 @@ n就可以了，就是Num.n，然后计算Num-Num.n所有的开头，要求这�
 .. code-block:: none
 
   fact Sequence {
-    no iden & ^n
-    one (Num - Num.n)
-    one x: Num | no x.n
+  no iden & ^n
+  one (Num - Num.n)
+  one x: Num | no x.n
   }
 
 我们再run，就会得到这个结果：
@@ -923,13 +913,12 @@ n就可以了，就是Num.n，然后计算Num-Num.n所有的开头，要求这�
 
 .. warning::
 
-   这个过程你会发现和我们架构设计的过程很像：我们用严密的语言定义规则，但用具像
-   去推理这个规则是否成立。我们可能永远都无法穷举我们的定义。但我们只要找到一个
-   可以推翻这个定义，我们就需要修改完善我们的定义，这样才能保证我们的整个设计是
-   正确的，能对我们的所有细节起到帮助。
+  这个过程你会发现和我们架构设计的过程很像：我们用严密的语言定义规则，但用具像
+  去推理这个规则是否成立。我们可能永远都无法穷举我们的定义。但我们只要找到一个
+  可以推翻这个定义，我们就需要修改完善我们的定义，这样才能保证我们的整个设计是
+  正确的，能对我们的所有细节起到帮助。
 
-一个更真实的例子：RISCV的内存模型
-=================================
+## 一个更真实的例子：RISCV的内存模型
 
 介绍
 ----
@@ -946,18 +935,18 @@ n就可以了，就是Num.n，然后计算Num-Num.n所有的开头，要求这�
 ::
 
   注：芯片的内存模型是个非常专业的领域，所以这个例子对一般人来说可能不太友好。
-      但其实从模型的角度来说，问题本身还是很简单的，只是一个排队的问题，所以，
-      有兴趣了解Alloy建模方法的读者不妨忍受一下那些专业名词，耐心看看这个例子。
-      如果有某些地方觉得而不好理解，不妨给我留言，我补充相关的描述给您解释。
+  但其实从模型的角度来说，问题本身还是很简单的，只是一个排队的问题，所以，
+  有兴趣了解Alloy建模方法的读者不妨忍受一下那些专业名词，耐心看看这个例子。
+  如果有某些地方觉得而不好理解，不妨给我留言，我补充相关的描述给您解释。
 
-      RISCV的这个模型包括两个定义：其中riscv.als定义RVWMO（弱内存序），
-      ztso.als定义的是TSO（强内存序），后者只是前者的一点补充，我们这里只看前者。
+  RISCV的这个模型包括两个定义：其中riscv.als定义RVWMO（弱内存序），
+  ztso.als定义的是TSO（强内存序），后者只是前者的一点补充，我们这里只看前者。
 
-      RISCV的这个模型在最新的Alloy 6上是不能运行的（语法不兼容），
-      必须用旧的5或者更低的版本。
+  RISCV的这个模型在最新的Alloy 6上是不能运行的（语法不兼容），
+  必须用旧的5或者更低的版本。
 
-内存序问题
-----------
+### 内存序问题
+
 
 内存序是这样一个问题：当一段代码交给一个执行体（比如CPU核，RISCV中叫Hart）的时
 候，会形成一个代码作者意图中的序列，这叫程序序。但CPU让这个结果生效需要时间，这
@@ -982,14 +971,14 @@ Order），这组通过一个网络（我们这里不管它的细节），到达
 
 .. note::
 
-   自然哲学论中说：如果两个对象（概念）的属性全部相同，那么这两个对象就是同一个
-   对象。但自然哲学论中了整整一章来放这句话：What we cannot speak about we mush
-   pass over in silence。
+  自然哲学论中说：如果两个对象（概念）的属性全部相同，那么这两个对象就是同一个
+  对象。但自然哲学论中了整整一章来放这句话：What we cannot speak about we mush
+  pass over in silence。
 
-   这说的是：我们能说清楚“我们关心的问题的问题里面的逻辑”，但其他对象会看到什么，
-   那是另一个问题，这里的结论并不能推广到那些问题上。所以同样，这里我们关心程序
-   最终会“觉得”内存是怎么修改的，我们并没有承认，从内存的角度，内存就必然是那么
-   修改的。
+  这说的是：我们能说清楚“我们关心的问题的问题里面的逻辑”，但其他对象会看到什么，
+  那是另一个问题，这里的结论并不能推广到那些问题上。所以同样，这里我们关心程序
+  最终会“觉得”内存是怎么修改的，我们并没有承认，从内存的角度，内存就必然是那么
+  修改的。
 
 即使如此，由于CPU的要求可以同时到达内存，这个问题也非常复杂。为了简化问题，很多
 研究都把问题进一步化简为：内存接收各种请求也是有序的：
@@ -1004,23 +993,23 @@ Order）。这样，gmo就是ppo的一个组合关系了。这时，虽然我们
 在Vijay等人的《A Primer on Memory Consistency and Cache Coherence （2nd
 Edition）》中，把内存序模型分成两种：
 
-   1. Consistency-agnostic coherence
-   2. Consistency-directed coherence
+  1. Consistency-agnostic coherence
+  2. Consistency-directed coherence
 
 前者常见于CPU，后者常见于GPU。我们这里讨论的，就是他说的第一种模型，现在几乎是
 所有CPU设计的标准方法。
 
 .. warning::
 
-   也许您已经注意到了，这个方法其实效率不高。因为明明可以并行的行为（比如访问不
-   同的内存位置），还需要在gmo上排队，但现在保证语义一致的方法也就做到这个程度
-   了。如果你能提出一个更好的模型，也许就改变整个竞争格局了。
+  也许您已经注意到了，这个方法其实效率不高。因为明明可以并行的行为（比如访问不
+  同的内存位置），还需要在gmo上排队，但现在保证语义一致的方法也就做到这个程度
+  了。如果你能提出一个更好的模型，也许就改变整个竞争格局了。
 
-   我强调这一点，是要一再强调：设计，特别是构架设计，是一种在工程成本下找路的艺
-   术。我们对增加的每个约束，其实都非常谨慎。增加约束可以收缩范围，我们的设计难
-   度就可以变低，但我们的自由度变低了，我们的竞争力就会下降，这是一个两难，而且
-   大部分情况下，我们因为工程成本的原因，无法在数学上判断这个两难孰轻孰重。最后
-   我们只能选择尽量把条件放在一起，构成一个逻辑闭包，让我们看得更清楚一点而已。
+  我强调这一点，是要一再强调：设计，特别是构架设计，是一种在工程成本下找路的艺
+  术。我们对增加的每个约束，其实都非常谨慎。增加约束可以收缩范围，我们的设计难
+  度就可以变低，但我们的自由度变低了，我们的竞争力就会下降，这是一个两难，而且
+  大部分情况下，我们因为工程成本的原因，无法在数学上判断这个两难孰轻孰重。最后
+  我们只能选择尽量把条件放在一起，构成一个逻辑闭包，让我们看得更清楚一点而已。
 
 最简单的ppo模型当然是ppo和po一致了。这个模型称为SEQUENTIAL CONSISTENCY（简称
 SC），它常常被用作基准，用来和其他模型进行比较。但实际中，也有真实的产品是直接
@@ -1036,18 +1025,18 @@ SC），它常常被用作基准，用来和其他模型进行比较。但实际
 这个规则有一个效果：如果A核写x读y，B核写y读x，那么无论怎么组合，不可能读出来的x
 和y都等于初值这种情况。考虑下面这个程序：::
 
-   x, y是内存地址，初值为0
-          A核              |            B核
-       store x, 1          |          store y, 1
-       load y, r1          |          load x, r1
+  x, y是内存地址，初值为0
+  A核              |            B核
+  store x, 1          |          store y, 1
+  load y, r1          |          load x, r1
 
 如果是SC，因为内存序和程序序总是一致的，两个核只有这些组合：::
 
   (x, y初值为0）
-           A:store x, 1 | A:store x, 1 | A:store x, 1 | B:store y, 1 | B:store y, 1
-           A:load y, r1 | B:store y, 1 | B:store y, 1 | A:store x, 1 | B:load x, r1
-           B:store y, 1 | A:load y, r1 | B:load x, r1 | B:load x, r1 | A:store x, 1
-           B:load x, r1 | B:load x, r1 | A:load y, r1 | A:load y, r1 | A:load y, r1
+  A:store x, 1 | A:store x, 1 | A:store x, 1 | B:store y, 1 | B:store y, 1
+  A:load y, r1 | B:store y, 1 | B:store y, 1 | A:store x, 1 | B:load x, r1
+  B:store y, 1 | A:load y, r1 | B:load x, r1 | B:load x, r1 | A:store x, 1
+  B:load x, r1 | B:load x, r1 | A:load y, r1 | A:load y, r1 | A:load y, r1
   (A.r1,B.r1)= (0,1)    |    (1,1)     |     (1,1)    |     (1,1)    |     (1,0)   
 
 没有两者都是0的组合。这个例子是一个非常典型的内存序的测试模型，称为MP，Message
@@ -1090,8 +1079,8 @@ TSO还是WMO，都会加上一些额外的约束，以保证编程语言在原�
 不同的指令语义制造各自的顺序要求，那么组合起来，他们的那些独立的承诺还能够成立
 吗？这就是对这个问题建模的目的。
 
-内存序建模
-----------
+### 内存序建模
+
 
 如前所述，我们通过设定ppo的标准来决定我们的“设计”，但作为一个模型，我们还要定义
 我们的“意图”来校验我们的设计能符合我们的意图。
@@ -1112,28 +1101,28 @@ RISCV这个建模其实只是测试了其中一部分的场景。但无论如何
 我们先看看它的sig模型是怎么定义的：::
 
   sig Hart {  // hardware thread
-    start : one Event
+  start : one Event
   }
   sig Address {}
   abstract sig Event {
-    po: lone Event // program order
+  po: lone Event // program order
   }
   
   abstract sig MemoryEvent extends Event {
-    address: one Address,
-    acquireRCpc: lone MemoryEvent,
-    acquireRCsc: lone MemoryEvent,
-    releaseRCpc: lone MemoryEvent,
-    releaseRCsc: lone MemoryEvent,
-    addrdep: set MemoryEvent,
-    ctrldep: set Event,
-    datadep: set MemoryEvent,
-    gmo: set MemoryEvent,  // global memory order
-    rf: set MemoryEvent
+  address: one Address,
+  acquireRCpc: lone MemoryEvent,
+  acquireRCsc: lone MemoryEvent,
+  releaseRCpc: lone MemoryEvent,
+  releaseRCsc: lone MemoryEvent,
+  addrdep: set MemoryEvent,
+  ctrldep: set Event,
+  datadep: set MemoryEvent,
+  gmo: set MemoryEvent,  // global memory order
+  rf: set MemoryEvent
   }
   sig LoadNormal extends MemoryEvent {} // l{b|h|w|d}
   sig LoadReserve extends MemoryEvent { // lr
-    pair: lone StoreConditional
+  pair: lone StoreConditional
   }
   sig StoreNormal extends MemoryEvent {}       // s{b|h|w|d}
   // all StoreConditionals in the model are assumed to be successful
@@ -1170,8 +1159,8 @@ Event里面关键是MemoryEvent这个子类。无论你有什么顺序要求，�
 基础定义之上就是对各种“天然事实”的约束了，比如对于gmo：::
 
   pred total[rel: Event->Event, bag: Event] {
-    all disj e, e': bag | e->e' in rel + ~rel
-    acyclic[rel]
+  all disj e, e': bag | e->e' in rel + ~rel
+  acyclic[rel]
   }
   fact { total[^gmo, MemoryEvent] }
 
@@ -1185,10 +1174,10 @@ Hart中），它们必然在gmo上被定义了顺序：要不e在e'前面，要�
 还有两个在其他内存序建模工具中很常用的基础设施，rf和fr：
 
 1. rf：Read From：这表示对于一组内存行为来说，对于同一个地址，某个读指令从某个
-   之前的写指令写过来。它是一个共地址的w->r的成对内存操作。
+  之前的写指令写过来。它是一个共地址的w->r的成对内存操作。
 
 2. fr：From Read：同上，这表示我把一个数据从内存读到CPU里面了，它在内存上有多少
-   种可能被别人给覆盖了，数据和我读到CPU中的内容不一样。
+  种可能被别人给覆盖了，数据和我读到CPU中的内容不一样。
 
 这两个接口很拗口，但其实你想想我们一开始说的那个MP测试就明白了。在那个测试中，
 我们不是先给内存放了一个初值，然后最终判断CPU分别拿到了初值还是修改过的值吗？
@@ -1213,35 +1202,35 @@ fun：rf是一个读对前面某些写的读，join上gmo的所有关系，就�
 基于基础模型，就可以定义ppo了：::
 
   fun ppo : Event->Event {
-    // same-address ordering
-    po_loc :> Store
-    + (AMO + StoreConditional) <: rfi
-    + rdw
+  // same-address ordering
+  po_loc :> Store
+  + (AMO + StoreConditional) <: rfi
+  + rdw
   
-    // explicit synchronization
-    + ppo_fence
-    + Acquire <: ^po :> MemoryEvent
-    + MemoryEvent <: ^po :> Release
-    + RCsc <: ^po :> RCsc
-    + pair
+  // explicit synchronization
+  + ppo_fence
+  + Acquire <: ^po :> MemoryEvent
+  + MemoryEvent <: ^po :> Release
+  + RCsc <: ^po :> RCsc
+  + pair
   
-    // syntactic dependencies
-    + addrdep
-    + datadep
-    + ctrldep :> Store
+  // syntactic dependencies
+  + addrdep
+  + datadep
+  + ctrldep :> Store
   
-    // pipeline dependencies
-    + (addrdep+datadep).rfi
-    + addrdep.^po :> Store
+  // pipeline dependencies
+  + (addrdep+datadep).rfi
+  + addrdep.^po :> Store
   }
   
   // the global memory order respects preserved program order
   fact { ppo in ^gmo }
 
   fun rdw : Event->Event {
-    (Load <: po_loc :> Load)  // start with all same_address load-load pairs,
-    - (~rf.rf)                // subtract pairs that read from the same store,
-    - (po_loc.rfi)            // and subtract out "fri-rfi" patterns
+  (Load <: po_loc :> Load)  // start with all same_address load-load pairs,
+  - (~rf.rf)                // subtract pairs that read from the same store,
+  - (po_loc.rfi)            // and subtract out "fri-rfi" patterns
   }
 
 最基本的承诺，当然是ppo就是^gmo的子集了（这个定义其实很有意思，我自己反正没有想
@@ -1255,23 +1244,23 @@ fun：rf是一个读对前面某些写的读，join上gmo的所有关系，就�
 我们打开一个子集看，比如这个same-address ordering，它包括几个要素：
 
 1. po_loc:>Store：同一个地址在po上有顺序的，而且后面是写的，在ppo
-   上必须保证写再后面。这个理解很自然，我在同一个CPU上写的程序，前面写了一个值，
-   后面再写，你总要保证后面那个才是正式写出去的结果，对吧？同样，前面如果是个读，
-   你也不能让我读到后面那个写吧？
+  上必须保证写再后面。这个理解很自然，我在同一个CPU上写的程序，前面写了一个值，
+  后面再写，你总要保证后面那个才是正式写出去的结果，对吧？同样，前面如果是个读，
+  你也不能让我读到后面那个写吧？
 
 2. (AMO + StoreConditional) <: rfi：同一个核同一个地址，前面写，后面读（rfi的定
-   义），我们不一定保证写在读的前面，但如果写是个原子操作，这是要保证的。
+  义），我们不一定保证写在读的前面，但如果写是个原子操作，这是要保证的。
 
 3. rdw保序。这个定义定义的是：你在一个Hart中做了两个Load，
 
-   同Hart同地址的两个Load，去掉load同一个指令写的地址的，
-   再去掉rfi前面还有一个同地址的操作的。换句话说，就是：在po中load同一个地址，
-   中间没有其他人写过，就不用保序，否则，就需要保序。
+  同Hart同地址的两个Load，去掉load同一个指令写的地址的，
+  再去掉rfi前面还有一个同地址的操作的。换句话说，就是：在po中load同一个地址，
+  中间没有其他人写过，就不用保序，否则，就需要保序。
 
 上面的定义涉及一个Alloy的语法，定义域和值域过滤。我们解释一下。比如对Acquire的
 顺序要求，是这样写的：::
 
-    Acquire <: ^po :> MemoryEvent
+  Acquire <: ^po :> MemoryEvent
 
 po是程序序，定义域留下Acquire的指令，值域留下MemoryEvent的指令，剩下的就是这个
 集合的结果。这个上下文中，也就是，剩下的这种顺序是保序的。从集合的角度这很绕。
@@ -1287,8 +1276,8 @@ po是程序序，定义域留下Acquire的指令，值域留下MemoryEvent的指
 
   // 给定一个内存事件，求gmo和po都在它前面的同地址写
   fun candidates[r: MemoryEvent] : set MemoryEvent {
-    (r.~^gmo & Store & same_addr[r])
-    + (r.^~po & Store & same_addr[r])
+  (r.~^gmo & Store & same_addr[r])
+  + (r.^~po & Store & same_addr[r])
   }
 
   // 给定一个event集合，求每个事件gmo在它前面的集合
@@ -1297,40 +1286,40 @@ po是程序序，定义域留下Acquire的指令，值域留下MemoryEvent的指
   // 一对写读操作，如果符合read-from的条件，那么写在gmo和po上都在读前面。
   // 反之依然：如果写gmo和po都在读前面，那么它必然符合read-from的条件。
   pred LoadValue {
-    all w: Store | all r: Load |
-      w->r in rf <=> w = latest_among[candidates[r]]
+  all w: Store | all r: Load |
+  w->r in rf <=> w = latest_among[candidates[r]]
   }
   
   // 对于Store的LR操作，没有同地址的另一个Hart的Store，使得这个Store是一个Read-From
   // 同时，
   pred Atomicity {
-    all r: Store.~pair |            // starting from the lr,
-      no x: Store & same_addr[r] |  // there is no store x to the same addr
-        x not in same_hart[r]       // such that x is from a different hart,
-        and x in r.~rf.^gmo         // x follows (the store r reads from) in gmo,
-        and r.pair in x.^gmo        // and r follows x in gmo
+  all r: Store.~pair |            // starting from the lr,
+  no x: Store & same_addr[r] |  // there is no store x to the same addr
+  x not in same_hart[r]       // such that x is from a different hart,
+  and x in r.~rf.^gmo         // x follows (the store r reads from) in gmo,
+  and r.pair in x.^gmo        // and r follows x in gmo
   }
 
   run MP {
-    some disj a, b, c, d : MemoryEvent, disj x, y: Address |
-      a in Store & x.~address and
-      b in Store & y.~address and
-      c in Load & y.~address and
-      d in Load & x.~address and
-      a->b + c->d in ppo and
-      b->c in rf and
-      d->a in fr and
-      RISCV_mm
+  some disj a, b, c, d : MemoryEvent, disj x, y: Address |
+  a in Store & x.~address and
+  b in Store & y.~address and
+  c in Load & y.~address and
+  d in Load & x.~address and
+  a->b + c->d in ppo and
+  b->c in rf and
+  d->a in fr and
+  RISCV_mm
   } for 8
 
 首先是两个最基本的要求：称为RISCV_mm，又称为RISCV内存序公理。这个东西就是我们说
 的：我们希望达成的基本意图。它这里包括两个意图：
 
 1. LoadValue：对任何一对写-读操作，如果它们是rf，等价于，写是r之前所有同地址写
-   的最后一个。
+  的最后一个。
 
 2. 原子性原则：对所有的LR-SC操作，如果成功，gmo中不应该再找到一个同地址的写操作。
-   这个原则其实就是LR-SC指令的原始定义。
+  这个原则其实就是LR-SC指令的原始定义。
 
 这些，其实都是对典型场景的测试。它不是所有场景的穷举。所以，其实这个内存模型，
 其实是一种严格的语义定义，并且在一定程度上对这些定义的范围的校验，但它不能穷举
@@ -1347,8 +1336,8 @@ po是程序序，定义域留下Acquire的指令，值域留下MemoryEvent的指
 附录
 ====
 
-Alloy集合操作符速查
--------------------
+### Alloy集合操作符速查
+
 
 * p->q：关联操作，求p，q两个集合的所有对应关系。想象p，q是男女的集合，p->q是所
   有婚姻的组合可能。

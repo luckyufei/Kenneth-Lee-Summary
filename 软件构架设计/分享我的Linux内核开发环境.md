@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 分享我的Linux内核开发环境
-**************************
 
 这个文档本来是应该用来回答这个问题的：
 
@@ -51,9 +46,9 @@ drivers/leds里面随便找一个文件，拷贝一份，仿照他写一个程�
 通的C程序一样，或者像调试一个本地程序一样，用gdb来单步跟踪。在你的PC上，你可以
 用qemu模拟一个硬件，然后启动你自己编译的内核，我这里有两个模拟方法：
 
-        :doc:`怎样快速调试Linux内核`
+  :doc:`怎样快速调试Linux内核`
 
-        :doc:`X86上的ARM Linux调试环境`
+  :doc:`X86上的ARM Linux调试环境`
 
 我个人推荐在PC上模拟ARM的环境，以我的经验，这样问题少很多，比如模拟x86很容易单
 步不下来，在ARM上就不会。x86的历史包袱太重了。
@@ -113,63 +108,63 @@ gcc/binutils不用说了，你做C语言编程，这是必须的，而且这东�
 everyday的开发工作，不知道工作量都在什么地方。我举个例子，我要启动一个内核的调
 试，我用命令行的写法是这样的：::
 
-        ~/work/qemu-run-arm64/qemu/aarch64-softmmu/qemu-system-aarch64 \
-                -s -cpu cortex-a57 -machine virt \
-                -trace enable=wd_dummy_v2_* \
-                -nographic -smp 1 -m 1024m -kernel arch/arm64/boot/Image \
-                -device virtio-net-pci,netdev=net0 \
-                -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
-                -fsdev local,id=p9fs,path=$P9PATH,security_model=mapped \
-                -device virtio-9p-pci,fsdev=p9fs,mount_tag=p9 \
-                -append "console=ttyAMA0 uacce.dyndbg=+p wd_dummy2.dyndbg=+p debug"
+  ~/work/qemu-run-arm64/qemu/aarch64-softmmu/qemu-system-aarch64 \
+  -s -cpu cortex-a57 -machine virt \
+  -trace enable=wd_dummy_v2_* \
+  -nographic -smp 1 -m 1024m -kernel arch/arm64/boot/Image \
+  -device virtio-net-pci,netdev=net0 \
+  -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
+  -fsdev local,id=p9fs,path=$P9PATH,security_model=mapped \
+  -device virtio-9p-pci,fsdev=p9fs,mount_tag=p9 \
+  -append "console=ttyAMA0 uacce.dyndbg=+p wd_dummy2.dyndbg=+p debug"
 
 这东西会成为我工作目录下的一个脚本，我根本不会记得它，你让我记住每次在图形界面
 上怎么点吗？也许你会觉得图形也可以有会话保存这样的功能，但那种功能要一个一个学
 的，怎么能和这种直接映射为一段文本并且语法上具有一致性的方案来比呢？实际上，我
 这个脚本完整是这样的：::
 
-        #!/bin/sh
+  #!/bin/sh
 
-        #if use drive which if=ide, set root to /dev/sda1
-        #if use drive which if=virtio, set root to /dev/vda1
+  #if use drive which if=ide, set root to /dev/sda1
+  #if use drive which if=virtio, set root to /dev/vda1
 
-        P9PATH=~/work/xxxx-repo/xxxx/test
+  P9PATH=~/work/xxxx-repo/xxxx/test
 
-        ~/work/qemu-run-arm64/qemu/aarch64-softmmu/qemu-system-aarch64 \
-                -s -cpu cortex-a57 -machine virt \
-                -trace enable=wd_dummy_v2_* \
-                -nographic -smp 1 -m 1024m -kernel arch/arm64/boot/Image \
-                -device virtio-net-pci,netdev=net0 \
-                -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
-                -fsdev local,id=p9fs,path=$P9PATH,security_model=mapped \
-                -device virtio-9p-pci,fsdev=p9fs,mount_tag=p9 \
-                -append "console=ttyAMA0 uacce.dyndbg=+p wd_dummy2.dyndbg=+p debug"
+  ~/work/qemu-run-arm64/qemu/aarch64-softmmu/qemu-system-aarch64 \
+  -s -cpu cortex-a57 -machine virt \
+  -trace enable=wd_dummy_v2_* \
+  -nographic -smp 1 -m 1024m -kernel arch/arm64/boot/Image \
+  -device virtio-net-pci,netdev=net0 \
+  -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
+  -fsdev local,id=p9fs,path=$P9PATH,security_model=mapped \
+  -device virtio-9p-pci,fsdev=p9fs,mount_tag=p9 \
+  -append "console=ttyAMA0 uacce.dyndbg=+p wd_dummy2.dyndbg=+p debug"
 
-        #These are tested:
-        # with external image
-        #qemu-system-aarch64 -cpu cortex-a57 -machine virt \
-        #	-S -s \
-        #	-drive if=none,file=ubuntu-14.04-server-cloudimg-arm64-uefi1.img,id=hd0 \
-        #	-device virtio-blk-device,drive=hd0 \
-        #	-nographic -smp 1 -m 1024m -kernel arch/arm64/boot/Image \
-        #	-append "console=ttyAMA0 root=/dev/vda1 init=/bin/sh"
-        #
-        # with buildroot as initramfs
-        #qemu-system-aarch64 -cpu cortex-a57 -machine virt \
-        #	-nographic -smp 1 -m 1024m -kernel arch/arm64/boot/Image \
-        #	-device virtio-net-pci,netdev=net0 -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
-        #	-fsdev local,id=p9fs,path=p9root,security_model=mapped \
-        #	-device virtio-9p-pci,fsdev=p9fs,mount_tag=p9 \
-        #	-append "console=ttyAMA0"
-        #
-        # with a user net:
-        #	the dhcp address of the guest is 10.0.2.15,
-        #	proxy is 100.0.2.2
-        #	dhcp server is 10.0.2.3
-        # with hostfwd:
-        #	ssh to local port will be redirect to guest port
-        # with plan 9 filesystem, mount in guest by:
-        #	mount -t 9p -o trans=virtio p9 /mnt
+  #These are tested:
+  # with external image
+  #qemu-system-aarch64 -cpu cortex-a57 -machine virt \
+  #	-S -s \
+  #	-drive if=none,file=ubuntu-14.04-server-cloudimg-arm64-uefi1.img,id=hd0 \
+  #	-device virtio-blk-device,drive=hd0 \
+  #	-nographic -smp 1 -m 1024m -kernel arch/arm64/boot/Image \
+  #	-append "console=ttyAMA0 root=/dev/vda1 init=/bin/sh"
+  #
+  # with buildroot as initramfs
+  #qemu-system-aarch64 -cpu cortex-a57 -machine virt \
+  #	-nographic -smp 1 -m 1024m -kernel arch/arm64/boot/Image \
+  #	-device virtio-net-pci,netdev=net0 -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
+  #	-fsdev local,id=p9fs,path=p9root,security_model=mapped \
+  #	-device virtio-9p-pci,fsdev=p9fs,mount_tag=p9 \
+  #	-append "console=ttyAMA0"
+  #
+  # with a user net:
+  #	the dhcp address of the guest is 10.0.2.15,
+  #	proxy is 100.0.2.2
+  #	dhcp server is 10.0.2.3
+  # with hostfwd:
+  #	ssh to local port will be redirect to guest port
+  # with plan 9 filesystem, mount in guest by:
+  #	mount -t 9p -o trans=virtio p9 /mnt
 
 这其实不但是一个脚本，也是一个笔记。脚本本质是一种“交流”语言，也是用Unix系统的
 控制力在多个物理实体和抽象层面上都可以生效的基础。
@@ -190,32 +185,32 @@ everyday的开发工作，不知道工作量都在什么地方。我举个例子
 都能用，这本身就是个控制力的问题。更重要的是，大部分时候我连gvim都不用，因为我
 需要用vim来延续这种脚本控制力。你可以看看我的vimrc，我会有很多这样的脚本的：::
 
-        command Gb e! ++enc=gb2312
+  command Gb e! ++enc=gb2312
 
-        if filereadable("cscope.out")
-                cs add cscope.out
-        endif
+  if filereadable("cscope.out")
+  cs add cscope.out
+  endif
 
-        if filereadable("vim.local")
-                source vim.local
-        endif
+  if filereadable("vim.local")
+  source vim.local
+  endif
 
-        if filereadable("build.sh")
-                set makeprg=./build.sh
-        elseif filereadable("armbuild.sh")
-                set makeprg=./armbuild.sh
-        elseif filereadable("x86build.sh")
-                set makeprg=./x86build.sh
-        endif
+  if filereadable("build.sh")
+  set makeprg=./build.sh
+  elseif filereadable("armbuild.sh")
+  set makeprg=./armbuild.sh
+  elseif filereadable("x86build.sh")
+  set makeprg=./x86build.sh
+  endif
 
-        command -nargs=+ Cgrep grep -Ir --include "*.[ch]" <args>
-        command -nargs=+ CSgrep grep -Ir --include "*.[chsS]" <args>
+  command -nargs=+ Cgrep grep -Ir --include "*.[ch]" <args>
+  command -nargs=+ CSgrep grep -Ir --include "*.[chsS]" <args>
 
-        colorscheme elflord
+  colorscheme elflord
 
-        command -range Sv <line1>,<line2>w! /tmp/g_vim_433291
-        command Lv r /tmp/g_vim_433291
-        map <C-D> :!sdcv <C-R><C-W><CR>
+  command -range Sv <line1>,<line2>w! /tmp/g_vim_433291
+  command Lv r /tmp/g_vim_433291
+  map <C-D> :!sdcv <C-R><C-W><CR>
 
 这其实都不是什么高大上的插件，完全就是我每次都要干的活（包括很多依赖控制台的命
 令），就直接包装一下，要不变成命令，要不变成自动化工具，这样工作起来效率就很高
@@ -227,7 +222,7 @@ vim的一般编辑功能也没有什么特别，主要好处就是热键多，�
 多编辑工具都无法达到的）。但这个其实不算是什么优势，核心优势还是和其他脚本工具
 的无缝集成，比如我可以用::
 
-        :r !ls *.c
+  :r !ls *.c
 
 直接把当前目录的C文件名读到我正在编辑的文件里，也可以用:'<,'>!sort把头文件列表
 排个序什么的，这才是它方便的地方。此外，特色功能上，我比较喜欢的有这么几个：
@@ -268,37 +263,37 @@ vim可以配合ctags, cscope和global来解决，而更多时候，因为内核�
 
 下面这个是我用的tmux配置：::
 
-        set-window-option -g mode-keys vi
-        #set-window-option -g utf8 on
-        #set-option -g status-utf8 on
-          
-        set-option -g prefix C-a
+  set-window-option -g mode-keys vi
+  #set-window-option -g utf8 on
+  #set-option -g status-utf8 on
+  
+  set-option -g prefix C-a
 
-        #unbind-key C-b
-        bind-key a send-prefix
-        bind-key C-a last-window
-        bind-key C-w last-pane      
+  #unbind-key C-b
+  bind-key a send-prefix
+  bind-key C-a last-window
+  bind-key C-w last-pane      
 
-        bind -n M-Left select-pane -L
-        bind -n M-Right select-pane -R
-        bind -n M-Up select-pane -U
-        bind -n M-Down select-pane -D
+  bind -n M-Left select-pane -L
+  bind -n M-Right select-pane -R
+  bind -n M-Up select-pane -U
+  bind -n M-Down select-pane -D
 
-        bind-key c new-window -c "#{pane_current_path}"
-        bind-key '"' split-window -c "#{pane_current_path}"
-        bind-key % split-window -h -c "#{pane_current_path}"
+  bind-key c new-window -c "#{pane_current_path}"
+  bind-key '"' split-window -c "#{pane_current_path}"
+  bind-key % split-window -h -c "#{pane_current_path}"
 
-        #enable mount
-        set-option -g mouse on
+  #enable mount
+  set-option -g mouse on
 
 你可以看到了，在tmux做编辑，也可以用vi的热键，其实我不用tmux，控制台的热键也是
 vi的，这是我的inputrc：::
 
-        set editing-mode vi
-        set keymap vi
-        set input-meta on
-        set output-meta on
-        set bell-style none
+  set editing-mode vi
+  set keymap vi
+  set input-meta on
+  set output-meta on
+  set bell-style none
 
 所以，你觉得学vim的成本很高，但和整个开发环境要用的一对比，你就会发现其实这个性
 价比是很高的。
@@ -310,7 +305,7 @@ vi的，这是我的inputrc：::
 blame去看看它的修改记录，你就可以知道某段代码是谁写的，在那个补丁里面写进去的，
 为什么要写进去，比如这样：
 
-        .. figure:: _static/git-blame.jpg
+  .. figure:: _static/git-blame.jpg
 
 这是kernel/kmod.c的每行修改记录，你可以看到，每个头文件是谁包含进去的，在哪个补
 丁包含进入的，都是可以找到的。
@@ -318,7 +313,7 @@ blame去看看它的修改记录，你就可以知道某段代码是谁写的，
 比如你这里看到Al Viro包含了ptrace.h，你不知道他为什么要加这个，你可以看看他当时
 提交的补丁：git show a74fb73：
 
-        .. figure:: _static/git-show.jpg
+  .. figure:: _static/git-show.jpg
 
 所以，通常我们把开发过程和提交过程是分开来管理的。比如你要开发一个新功能，你可
 以git clone一个最新的内核分支，然后git co -b一个新的分支，在那里随便修改，每天
@@ -351,13 +346,13 @@ make menuconfig把kernel hacking菜单下死锁检查，内存调试这些功能
 pop3服务器上，你就能直接用文本和它互动，你觉得互相独立的什么发件人，收件人，其
 实都是一段原始的文本，好比这样：::
 
-        Message-ID: <55F0E6D6.9060308@xxxxxxxx.com>                                    
-        Date: Thu, 10 Sep 2015 10:11:34 +0800                                           
-        From: XXXXX <xxx.xxxxx@xxxxxxx.com>                                         
-        User-Agent: Mozilla/5.0 (Windows NT 6.1; rv:17.0) Gecko/20130509 Thunderbird/17.0.6
-        MIME-Version: 1.0                                                               
-        To: xxxx                                      
-        CC: xxxx
+  Message-ID: <55F0E6D6.9060308@xxxxxxxx.com>                                    
+  Date: Thu, 10 Sep 2015 10:11:34 +0800                                           
+  From: XXXXX <xxx.xxxxx@xxxxxxx.com>                                         
+  User-Agent: Mozilla/5.0 (Windows NT 6.1; rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+  MIME-Version: 1.0                                                               
+  To: xxxx                                      
+  CC: xxxx
 
 如果你发的是有格式的文本，或者一段视频出去。邮件服务器只是把邮件的内容包装成特
 殊的本文或者html来发送而已。
@@ -378,7 +373,7 @@ pop3服务器上，你就能直接用文本和它互动，你觉得互相独立�
 这个维护者用mutt收到这个补丁了，他可以选择他们，存到一个mailbox里面（这其实仍是
 一个文本文件），然后用git am直接合入自己的一个分支上：
 
-        .. figure:: _static/mutt.jpg
+  .. figure:: _static/mutt.jpg
 
 然后他就可以Review或者测试这个补丁了。
 

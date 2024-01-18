@@ -1,12 +1,5 @@
-.. Kenneth Lee 版权所有 2021
-
-:Authors: Kenneth Lee
-:Version: 1.0
-:Date: 2021-12-01
-:Status: Draft
-
+        
 perf bench的各个测试用例分析
-****************************
 
 perf bench最近加了不少测试用例，我分析一下代码，看看它具体测试了什么。
 
@@ -15,7 +8,7 @@ perf bench最近加了不少测试用例，我分析一下代码，看看它具�
 * sched
 
   * message: 创建多个线程或者进程，成对建立UNIT socket或者pipe，发送100字节为单
-    位的数据，没有其他work load了。
+  位的数据，没有其他work load了。
 
   * pipe: 同上，但只用pipe做int的pingpong，调度要求更激烈。
 
@@ -31,6 +24,6 @@ perf bench最近加了不少测试用例，我分析一下代码，看看它具�
   * synthesis: 对当前事件进行综合
   * kallsyms-parse：分析/proc/kallsyms
   * inject-build-id: 
-                                               
+  
 这些代码的风格我个人是不喜欢的，它几乎每个测试例都是独立的，有更多重复代码，我
 不明白有什么必要，当然，对于这样的测试来说无伤大雅就是了。

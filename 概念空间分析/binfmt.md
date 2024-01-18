@@ -1,12 +1,7 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 :index:`binfmt`
 
 binfmt概念空间建模
-******************
 
 准备要做一种新的二进制格式，本文对Linux二进制格式，特别是这个格式和它的执行单元
 直接的关系做一个概念建模。
@@ -16,9 +11,9 @@ binfmt概念空间建模
 Linux对每种二进制格式进行抽象，抽象的接口叫linux_binfmt（以下简称binfmt），通过
 register_binfmt()进行注册，注册时提供的数据结构中，关键是三个函数：::
 
-        int (*load_binary)(struct linux_binprm *);
-        int (*load_shlib)(struct file *);
-        int (*core_dump)(struct coredump_params *cprm);
+  int (*load_binary)(struct linux_binprm *);
+  int (*load_shlib)(struct file *);
+  int (*core_dump)(struct coredump_params *cprm);
 
 后面两个都是辅助的，从概念关联的角度，我们只需要关心第一个就可以了。这个回调作
 用在do_execve()阶段，也就是，进程已经fork了，有了和这个进程相关所有管理信息，比

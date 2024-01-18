@@ -1,12 +1,5 @@
-.. Kenneth Lee 版权所有 2021
-
-:Authors: Kenneth Lee
-:Version: 1.0
-:Date: 2021-12-02
-:Status: Draft
-
+        
 vDAP概念空间分析
-****************
 
 本文分析一下vDAP的概念原理。
 
@@ -16,10 +9,9 @@ vDAP概念空间分析
 我们先用Redhat的这个基本介绍博文：
 `Hands on vDPA <https://www.redhat.com/en/blog/hands-vdpa-what-do-you-do-when-you-aint-got-hardware>`_
 ，来理解一下它的用法：
+  
+### 关于vhost和virtio
 
-
-关于vhost和virtio
------------------
 
 vDAP有两种用法，一种是作为一个vhost设备，一种是作为virtio设备。这两个概念很容易
 让人晕掉，我们先来理解一下：
@@ -45,8 +37,8 @@ qemu -netdev type=virtio-net-pci...），最后我们需要在内核中有一个
 的Guest驱动和不同位置的Backend驱动。前者适合在一个qemu内部互相通讯，也更灵活，
 后者适合直接对外通讯，但需要在Host上完成各种配置，再连到qemu中。
 
-vhost用法
----------
+### vhost用法
+
 
 要通过vhost使用，你先要在host上创建vhost设备，这需要：::
 
@@ -65,8 +57,8 @@ vhost用法
 这样guest中多了一个网络设备，可以用virtio-net访问，对它访问直接被转到host的设备
 中。
 
-virtio用法
-----------
+### virtio用法
+
 
 virtio用法类似传统的SR-IOV的用法，首先你是机器上有一个VF（这个如果没有硬件仍可
 以通过modprobe vpda_sim来模拟），然后你需要unbind你原来的driver，然后重新bind

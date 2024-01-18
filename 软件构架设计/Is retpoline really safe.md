@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2018-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Is retpoline really safe?
-**************************
 
 retpoline is a solution from Google for Spectre BTB Injection attack.
 

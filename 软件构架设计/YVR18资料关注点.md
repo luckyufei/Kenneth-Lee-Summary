@@ -1,13 +1,9 @@
 ..KennethLee版权所有2018-2020
 
-:Authors:KennethLee
-:Version:1.0
-
+    
 YVR18资料关注点
-***************
 
-PAC和BTI特性的目的
-==================
+## PAC和BTI特性的目的
 
 今年由于计划冲突没有参加LinaroConnect，假期把会议分享的材料都看了一遍，把有意
 思的一些信息总结在这里。
@@ -31,15 +27,15 @@ ARM在指令版本v8.3（这里都是指A系列）的时候开始引入PAC，到
 执行的指令的页面上给定一个标记c，跳转的目标指令如果不以btic开头，就异常。示例
 代码如下：::
 
-        start:
-                blrx0
-                ...
-        good: //如果x0定位在这里，就是正常的
-                btic
-                ...
-                bad://如果x0定位在这里，就会异常
-                movx0,#16
-                ...
+  start:
+  blrx0
+  ...
+  good: //如果x0定位在这里，就是正常的
+  btic
+  ...
+  bad://如果x0定位在这里，就会异常
+  movx0,#16
+  ...
 
 我最早看PAC的Spec的时候，第一反应是这东西是用来支持pkey_mprotect()的（要知道这
 是什么，请参考manmprotect，它是mprotect的升级版本）。但从这次会议的介绍来看，
@@ -73,17 +69,17 @@ qemuTCG功能可以用于qemu-user和qemu-system，我个人很少用user，我�
 当你启动qemu后，可以通过^ac切换到qemu的虚拟机控制台，然后你可以用如下命令来查
 你可以跟踪的事件：::
 
-        infotrace-events
+  infotrace-events
 
 这个命令可以带参数对结果进行过滤：::
 
-        infotrace-eventsgicv3_*
+  infotrace-eventsgicv3_*
 
 确定你要跟踪的事件后，用trace-event来跟踪对应事件，用trace-file设置跟踪文件（也
 可以直接通过命令行参数-trace指定）：::
 
-        trace-eventsgicv3_*on
-        trace-filesetmytrace.out
+  trace-eventsgicv3_*on
+  trace-filesetmytrace.out
 
 qemu不是时钟精确的模拟器，暂时来说我还找不到非要用这个东西调试的场景，不过我对
 这个东西的未来还是抱很高的期望。
@@ -97,8 +93,7 @@ qemu不是时钟精确的模拟器，暂时来说我还找不到非要用这个�
 也比较差，暂时离实用还有距离。有人可能觉得这个东西用Foundation或者FPGAEmulator
 就可以代替了，但这两个东西的效率和价钱……对吧？
 
-HPC相关进展
-===========
+## HPC相关进展
 
 Linaro的HPC实验室筹划了有相当长的时间了，这次第一次看到有实物介绍出来（116）。
 网络上包含两个1G的子网，用于外部接入（uplink）和BMC访问（bmc），以及两个100G子
@@ -119,8 +114,7 @@ Workload管理）。
 
 todo：其他的待补
 
-Treble
-=======
+## Treble
 Treble方案在Linaro推了3年，从一开始谁都说不清楚是什么，现在再看，看起来比较成熟
 了，虽然我自己不做手机方案了，但现在有人想到要“在服务器领域也可以学习Treble的优
 秀实践”，所以我也来总结一下Treble方案的核心在什么地方。
@@ -148,14 +142,14 @@ Treble兼容性通过升级的HAL层实现，为此引入了一种HIDL语言来�
 HIDL本质上是对Binder接口的封装，源文件用hal做扩展名，很类似过去Binder的Java接口
 定义文件，像这样：::
 
-        interfaceIBarextendsIFoo{//IFooisanotherinterface
-                //embeddedtypes
-                structMyStruct{/*...*/};
+  interfaceIBarextendsIFoo{//IFooisanotherinterface
+  //embeddedtypes
+  structMyStruct{/*...*/};
 
-                //interfacemethods
-                create(int32_tid)generates(MyStructs);
-                close();
-        };
+  //interfacemethods
+  create(int32_tid)generates(MyStructs);
+  close();
+  };
 
 如果是绑定式或者共享内存式，Framework和HAL间就是IPC调用，如果是SP-HAL方式，就变
 成dlopen，然后直接进行相关的本地调用。
@@ -180,8 +174,7 @@ Treble要求各家必须使用ko的方式提供驱动，然后尝试把通用内
 维护，代码的安全令人担心。但他们也承认这个问题在于，SoC的生命周期太短，这是影响
 厂商投入到代码主线化的动力。AndroidCommon版本的质量保证用例主要来自两方面：LTP
 和VTS（VendorTestSuit，通过sysfs激活Android相关功能）。
-
-
+  
 我个人不太认可这种实践可以用于服务器的。所谓接口稳定，前提就是接口没有改进需求
 了。是改进期望影响了接口的稳定性，而不是接口稳定性的需求决定了如何改进。在PC领
 域，很早就实现前向兼容了，而在几乎一样软件栈的服务器领域，到现在都没有完全实现
@@ -200,7 +193,7 @@ SPDX
 
 最近上传LinuxKernel的代码的时候，都是拷贝别人的版权声明头，比如这样：::
 
-        SPDX-License-Identifier:GPL-2.0+
+  SPDX-License-Identifier:GPL-2.0+
 
 一直没有认真去看看为什么现在都这样写声明了。209演讲里面，LinuxFoundation有人来
 讲了相关的背景，这都源自这个项目：SoftwarePackageDataExchange(SPDX)
@@ -210,7 +203,7 @@ SPDX
 
 实际上，根据最新定义的2.0版本，上面那个定义应该写成：::
 
-        SPDX-License-Identifier:GPL-2.0-or-later
+  SPDX-License-Identifier:GPL-2.0-or-later
 
 GPL-2.0+已经被废弃了。
 
@@ -223,10 +216,8 @@ SoftwarePackageDataExchange(SPDX)spdx.org
 然后直接在源文件的最前面加上这个声明。更详细的表述方法，可以参考演讲221中的L4Re
 的声明方法：
 kernkonzept/l4re-core
-
-
-当前的Linux调度器设计
-=====================
+  
+## 当前的Linux调度器设计
 
 演讲220对Linux当前的调度器做了一个科普，感觉不深不浅的，不知道对大部分读者是否
 具有参考价值。我对来说，已经很久没有看Linux的调度器了，很多原来没有很明确的概念
@@ -335,8 +326,7 @@ O(1)可控。
 其实吧，也没有保证能公平的调度算法，这最后基本上就是调整出来的。也许等待AI的影
 响力足够强，这东西应该是通过神经网络自动训练出来的？
 
-内核测试手段
-============
+## 内核测试手段
 
 演讲224和301介绍了在kselftest中增加ftracetest用例，还介绍了在内核中做GCOV的方法
 。这让我想起要把Documents/dev-tools目录看一遍，就着写这个总结，我把相关的逻辑理
@@ -351,7 +341,7 @@ Linux内核进展越来越快，越来越成熟。现在上传一个特性到内
 静态检查的，除了checkpatch，我们还可以用sparse。用法如下（在安装了sparse的前提
 下）：::
 
-        makeC=1
+  makeC=1
 
 这会增加更严格的惯例检查。检查是附属在普通编译过程中的，如果你已经编译了所有.o
 了，这个检查不会发生。
@@ -359,31 +349,30 @@ Linux内核进展越来越快，越来越成熟。现在上传一个特性到内
 还有一个更强大的是胭脂虫(coccinelle)，用法如下（在安装了coccinelle以后，注1）：
 ::
 
-        makecoccicheck
+  makecoccicheck
 
 这个命令可以缩小到某个目录的范围内，比如：::
 
-        makecoccicheckM=my/own/directory
+  makecoccicheckM=my/own/directory
 
 我试了一下，这个检查的功能还是很强大的，比如我的代码中有这么一行：::
 
-        q->svas->nr_pages=(vma->vm_end-vma->vm_start)>>PAGE_SHIFT
+  q->svas->nr_pages=(vma->vm_end-vma->vm_start)>>PAGE_SHIFT
 
 它还能报这种错：::
 
-        WARNING:Considerusingvma_pageshelperonvma
+  WARNING:Considerusingvma_pageshelperonvma
 
 这个可以作为上传前标准检查的一部分。
-
-
+  
 动态检查的，我们有如下工具可以用：
 
-kselftest
-----------
+### kselftest
+
 这个类似LTP，是内置的一组功能测试用例，这样编译和运行：::
 
-        make-Ctools/testing/selftest
-        makekselftest
+  make-Ctools/testing/selftest
+  makekselftest
 
 其实编译出来的就是一个个独立的可执行程序，拷贝过去直接运行就可以了。
 
@@ -398,8 +387,8 @@ gcov
 以在/sys/kernel/debugfs/gcov找到所有跟踪数据文件（.gcda)，用gcov命令就可以直接
 看到代码的执行覆盖率。
 
-kmemleak和Kasan
------------------
+### kmemleak和Kasan
+
 这两个是自动内存检查，前者发现内存泄漏，后者发现use-after-free错误，分别通过
 CONFIG_DEBUG_KMEMLEAK和CONFIG_KASAN使能，发现有问题会自动抱错的，可以作为基本CI
 系统的一部分来用。
@@ -410,8 +399,7 @@ CONFIG_DEBUG_KMEMLEAK和CONFIG_KASAN使能，发现有问题会自动抱错的�
 运行不起来，建议下源代码自行编译。另外注意：coccinelle的configure写得有问题，检
 查不到部分开发库不存在的问题，所以如果编译失败，根据名称安装对应的开发库即可。
 
-AutoFDO@ARM
-============
+## AutoFDO@ARM
 
 演讲416做了一个关于在ARM平台上使用perf的介绍，除了有一些基本的如何使用perf的知
 识以外，特别介绍了使用基于perf使用CoreSight（注1）等ARM专有功能。
@@ -427,47 +415,47 @@ AutoFDO@ARM
 
 下面是我在我的桌面机器上用这个技术运行gcc的例子的结果。编译过程如下：::
 
-        BN=bubble
-        ALL=$(BN)_o0$(BN)_o3$(BN)_fdo
+  BN=bubble
+  ALL=$(BN)_o0$(BN)_o3$(BN)_fdo
 
-        all:$(ALL)
+  all:$(ALL)
 
-        $(BN)_o0:$(BN).c
-                gcc$<-o$@
+  $(BN)_o0:$(BN).c
+  gcc$<-o$@
 
-        $(BN)_o3:$(BN).c
-                gcc-O3$<-o$@
+  $(BN)_o3:$(BN).c
+  gcc-O3$<-o$@
 
-        $(BN)_inst:$(BN).c
-                gcc-fprofile-generate$<-o$@
+  $(BN)_inst:$(BN).c
+  gcc-fprofile-generate$<-o$@
 
-        $(BN).gcda:$(BN)_inst
-                ./$(BN)_inst
+  $(BN).gcda:$(BN)_inst
+  ./$(BN)_inst
 
-        $(BN)_fdo:$(BN).c$(BN).gcda
-                gcc-O3-fprofile-use=$(BN).gcda$<-o$@
+  $(BN)_fdo:$(BN).c$(BN).gcda
+  gcc-O3-fprofile-use=$(BN).gcda$<-o$@
 
-        test:$(ALL)
-                ./$(BN)_o0
-                ./$(BN)_o3
-                ./$(BN)_fdo
+  test:$(ALL)
+  ./$(BN)_o0
+  ./$(BN)_o3
+  ./$(BN)_fdo
 
-        clean:
-                rm-f$(ALL)$(BN)_inst*.gcda*.gcno
+  clean:
+  rm-f$(ALL)$(BN)_inst*.gcda*.gcno
 
-        .PHONY:testclean
+  .PHONY:testclean
 
 结果如下：::
 
-        ./bubble_o0
-        Bubblesortingarrayof30000elements
-        3060ms
-        ./bubble_o3
-        Bubblesortingarrayof30000elements
-        1477ms
-        ./bubble_fdo
-        Bubblesortingarrayof30000elements
-        1161ms
+  ./bubble_o0
+  Bubblesortingarrayof30000elements
+  3060ms
+  ./bubble_o3
+  Bubblesortingarrayof30000elements
+  1477ms
+  ./bubble_fdo
+  Bubblesortingarrayof30000elements
+  1161ms
 
 对于这种算法类的程序（段），还是很有效果的。
 
@@ -493,10 +481,10 @@ AutoFDO依赖于PMU的这个特性：PERF_SAMPLE_BRANCH_STACK。简单说，就�
 最后补充一些零碎的关注点：
 
 * https://lkft.linaro.org/，ARM世界的功能测试，进展太慢了，到现在连块服务器单
-   板都没有104中ARM总结了一下Aarch8的特性引入时间，感觉挺有助于记忆的，我贴上来
-   ：
+  板都没有104中ARM总结了一下Aarch8的特性引入时间，感觉挺有助于记忆的，我贴上来
+  ：
 
-        .. figure:: _static/lkft.jpg
+  .. figure:: _static/lkft.jpg
 
 * Home - Akraino Edge Stack，ARM热推的“雾计算”的一个实现，我觉得是一个卖轻量级
   服务器的市场

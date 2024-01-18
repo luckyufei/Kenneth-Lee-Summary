@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2018-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Will and Won't
-***************
 
 今天重新听哈利波特6的第三章，突然意识到这一章的标题Will and Won't是什么意思，觉
 得很有趣，分享一下。

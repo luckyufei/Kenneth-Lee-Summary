@@ -1,12 +1,5 @@
-.. Kenneth Lee 版权所有 2022
-
-:Authors: Kenneth Lee
-:Version: 0.1
-:Date: 2022-04-27
-:Status: Draft
-
+        
 硬编码Tag方案
-*************
 
 这里给做某个实现的同事提供一个在自定义指令中实现硬编码一个Tag的软件实现技巧。
 
@@ -35,13 +28,13 @@
   
   #define stringify(str) #str
   #define debug_reach(TAG) asm( \
-		  "	.4byte " stringfy(OPCODE) "\n" \
-		  "	.4byte " stringfy(TAG) "\n")
+  "	.4byte " stringfy(OPCODE) "\n" \
+  "	.4byte " stringfy(TAG) "\n")
   
   int test(void) {
-          ... 
-	  debug_reach(0x1111);
-          ...  
+  ... 
+  debug_reach(0x1111);
+  ...  
   }
 
 这样，就可以在启动代码中大量打点，而不需要动态传递参数到指令中。

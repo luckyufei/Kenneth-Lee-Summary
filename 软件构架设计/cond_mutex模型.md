@@ -1,24 +1,19 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 cond/mutex模型
-**************
 
 本文给一位同学快速介绍一下pthread cond/mutex模型，作为他进行另一个设计的参考。
 
 pthread_cond用于实现提供者-消耗者模型。示意如下：
 
-        .. figure:: _static/cond_mutex模型1.jpg
+  .. figure:: _static/cond_mutex模型1.jpg
 
 这个图一画，你就发现这个破绽是非常明显的，因为可以发生这样的问题：
 
-        .. figure:: _static/cond_mutex模型2.jpg
+  .. figure:: _static/cond_mutex模型2.jpg
 
 pthread_cond的解决方案是再加一重保证，让signal发生在wait之后：
 
-        .. figure:: _static/cond_mutex模型3.jpg
+  .. figure:: _static/cond_mutex模型3.jpg
 
 这个实际复杂了很多，它要处理两种情形：
 

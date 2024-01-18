@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2017-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 从学习assert的用法开始理解如何写“专业的程序”
-*********************************************
 
 和不理解什么是基于语义进行编程的人是说不清楚assert应该怎么用的，所以，在这这一
 篇前，我先写了这一篇：基于“语义”编程。
@@ -29,18 +24,18 @@ https://pdos.csail.mit.edu/6.828/2017/readings/linux-lock.pdf，它断言成功�
 
 所以，断言的作用在于在一个“代码结构”之内“算无遗着”，比如我有如下代码结构：::
 
-        int a[SZ_T];
-        for(i=0; i<data_num; i++)
-                a[i] = 1/a[i];
+  int a[SZ_T];
+  for(i=0; i<data_num; i++)
+  a[i] = 1/a[i];
 
 这个代码目之所及，有很多不可靠的地方，如果我们加上断言，它就可靠了：::
 
-        int a[SZ];
-        assert(data_num<SZ);
-        for(i=0; i<data_num; i++) {
-                assert(a[i]!=0);
-                a[i] = 1/a[i];
-        }
+  int a[SZ];
+  assert(data_num<SZ);
+  for(i=0; i<data_num; i++) {
+  assert(a[i]!=0);
+  a[i] = 1/a[i];
+  }
 
 有人会争辩说，这个地方应该用实际的代码去检查。如果真的需要，这个我不反对。但出
 于性能的考虑，你不可能到处都进行多余的检查，在你做完所有那些检查后，我们回到这
@@ -66,11 +61,11 @@ Failure不成为Failure，但这个不是必然。用户关心他当时使用的
 
 最后，我们还需要注意“语义”可以控制的度。有人觉得我这个代码写错了：::
 
-        int main(int argc, char *argv[]) {
-                assert(argc==2);
-                printf("you give me %s", argv[1]);
-                return EXIT_SUCCESS;
-        }
+  int main(int argc, char *argv[]) {
+  assert(argc==2);
+  printf("you give me %s", argv[1]);
+  return EXIT_SUCCESS;
+  }
 
 他们会问，如果我调用这个程序的时候，没有给参数怎么办？
 
@@ -83,8 +78,7 @@ Failure不成为Failure，但这个不是必然。用户关心他当时使用的
 。这就好比有些人要不完全不写设计文档，要不写得像代码一样详细（最后坚持不下去又
 退化为不写设计文档），这都是不过脑子，死记形式导致的。如果你用Assert也是忘记目
 的，追求形式，最终的结果也是一样的。
-
-
+  
 补充1：我知道很多人——正如在讨论中呈现的那样——把assert看作是“调试版本”的一种检查
 工具。这是从结果，或者说“能跑”上来想这个问题的，而不是从语义上来想这个问题的。
 首先，我们要从“意思”上理解，并没有两个版本，调试版本不是版本，调试版本成为一个

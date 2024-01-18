@@ -1,15 +1,7 @@
-.. Kenneth Lee 版权所有 2021
-
-:Authors: Kenneth Lee
-:Version: 1.0
-:Date: 2021-11-26
-:Status: Draft
-
+        
 逻辑哲学论分析
-**************
 
-前言
-======
+## 前言
 
 这个专栏用于写对逻辑哲学论逻辑链的分析。
 
@@ -32,28 +24,28 @@
 念：Truth-Function。我不知道它是什么意思。图方便，我查了一下中文维基上的解释，
 它是这样的：
 
-        | 在逻辑中，真值函数是从语言的句子生成的函数。
-        | 它采用来自 {T,F} (就是真实和虚假)的真值。
-        | 例如句子 A → B 生成真值函数 h(A,B)，它的真值是 F，
-        | 当且仅当 A 的值是 T 而 B 的值是 F。
-        | n 个变量的命题句子生成 2^{2^n} 个真值函数。
-        | 比如，如果有像 A → (B → A) 这样的 2 个变量的命题则有 16 个生成的
-        | 真值函数。陈述或命题被称为是真值泛函的，如果它的真值由它的部件的
-        | 真值来决定。 
-        | ...
+  | 在逻辑中，真值函数是从语言的句子生成的函数。
+  | 它采用来自 {T,F} (就是真实和虚假)的真值。
+  | 例如句子 A → B 生成真值函数 h(A,B)，它的真值是 F，
+  | 当且仅当 A 的值是 T 而 B 的值是 F。
+  | n 个变量的命题句子生成 2^{2^n} 个真值函数。
+  | 比如，如果有像 A → (B → A) 这样的 2 个变量的命题则有 16 个生成的
+  | 真值函数。陈述或命题被称为是真值泛函的，如果它的真值由它的部件的
+  | 真值来决定。 
+  | ...
 
 各位读者可以停下来，好好想想，你是否知道它在说什么？反正我是看不懂，我也找了身
 边的人来看，他们也看不懂。
 
 然后我们看看英文版的：
 
-        | In logic, a truth function is a function that accepts truth values
-        | as input and produces a unique truth value as output.
-        | In other words: 
-        | The input and output of a truth function are all truth values;
-        | a truth function will always output exactly one truth value;
-        | and inputting the same truth value(s) will always output the same
-        | truth value.
+  | In logic, a truth function is a function that accepts truth values
+  | as input and produces a unique truth value as output.
+  | In other words: 
+  | The input and output of a truth function are all truth values;
+  | a truth function will always output exactly one truth value;
+  | and inputting the same truth value(s) will always output the same
+  | truth value.
 
 我都不用看完，作为一个计算机工程师，看第一句我就清楚知道这是什么了。当然，我也
 只是知道它的内涵，不看后面的介绍，我不能理解这个定义的外延，但至少内涵已经定义
@@ -71,10 +63,10 @@
 不知道，反正不是英语）。所以，只能求其次了，找一个同是西方语系的英文版本翻译来
 看吧（关键是这个翻译者本身就是个哲学家），所以我最终选的是这个版本：
 
-        | 《Tractatus Logico-Philosophicsu》，
-        | Writen by Ludwig Wittgenstein，
-        | Translated by D. F. Pears and B. F. McGuinness
-        | With an introduction by Bertrand Russell.
+  | 《Tractatus Logico-Philosophicsu》，
+  | Writen by Ludwig Wittgenstein，
+  | Translated by D. F. Pears and B. F. McGuinness
+  | With an introduction by Bertrand Russell.
 
 我假设看本文的读者是看过维特根斯坦的定义本身的。这个定义很短，有点像《道德经》
 那样的长度，风格其实也很像，都是通过直接下断言这种形式来描述观点，所以，要看完
@@ -86,8 +78,7 @@
 候，会去对应这个表述是否和原文的其他细节冲突，但我不会写出所有这些证据，这个动
 作需要读者自己去做。
 
-分析方法
-========
+## 分析方法
 
 我是个软件架构师，我的大部分工作都是抽取一个复杂系统的抽象。我通常用的方法是用
 不同的目标作为基线，对这个被分析系统针对这个目标的相关特征进行抽取。这个被分析
@@ -99,25 +90,24 @@
 Explainer*\ 。他完全从一个非M1设计者的角度分析M1的设计思路，他的手法和我这个是
 类似的，所以我也想用他的表述来增强我这个意思，他的说法是：
 
-        | As I have said, I've written and rewritten, experimented and
-        | re-experimented, with this section rpeatedly. I would come
-        | up with a general theory of how it all fitted together, then
-        | realize all my probes did not test and alternate explanation,
-        | run a new set of tests, and again be surprised.
+  | As I have said, I've written and rewritten, experimented and
+  | re-experimented, with this section rpeatedly. I would come
+  | up with a general theory of how it all fitted together, then
+  | realize all my probes did not test and alternate explanation,
+  | run a new set of tests, and again be surprised.
 
 所以，我这里也有他那个号召：
 
-        | If someone else has a better theory of how it all fits together,
-        | or advises a different set of experiments showing a flaw in my
-        | analysis, or even realizes I made a mistake in some of the
-        | experiments (it happens! especially when you have no idea what
-        | to expect, what counts as an unexpected result), please help
-        | advance our common understanding.
+  | If someone else has a better theory of how it all fits together,
+  | or advises a different set of experiments showing a flaw in my
+  | analysis, or even realizes I made a mistake in some of the
+  | experiments (it happens! especially when you have no idea what
+  | to expect, what counts as an unexpected result), please help
+  | advance our common understanding.
 
 希望读者能给我提供你的观察，以便“Advance our common understanding”。
 
-维特根斯坦研究的问题
-====================
+## 维特根斯坦研究的问题
 
 我们用我们在《道德经》分析中建立的逻辑空间来看待维特根斯坦研究的问题。
 
@@ -130,8 +120,8 @@ Explainer*\ 。他完全从一个非M1设计者的角度分析M1的设计思路�
 思维的部分，而猫的照片，对我们来说就没有逻辑可言，就是一片混沌。这就是道德经中
 说的“恍惚”，也是现在我对维特根斯坦这句话的理解：
 
-        | What can be said at all can be said clearly,
-        | and what we cannot talk about we must pass over in silence.
+  | What can be said at all can be said clearly,
+  | and what we cannot talk about we must pass over in silence.
 
 .. note::
 
@@ -147,9 +137,9 @@ silence中彼此认可。你也看过猫，我也看过猫，我们就可以用�
 
 作为印证，前面这句话后面，维特根斯坦是这样说的：
 
-        | Thus the aim of the book is draw a limit to thought or rather
-        | -- not to thought, but to the expression of thougth, we should
-        | have to find both sides of the limit thinkable.
+  | Thus the aim of the book is draw a limit to thought or rather
+  | -- not to thought, but to the expression of thougth, we should
+  | have to find both sides of the limit thinkable.
 
 每个名都可以被无限维度，无限空间地进行细分，这些细分的名，一同定义了这个抽象的
 名本身。所以，高层的名，是一个细节的名的集合。直到我们只能通过Silence传递到
@@ -175,8 +165,8 @@ Atomic的名上面。
 逻辑哲学论就是这样弄的，一个概念的定义可以十几页，你都没法抽象它原始的含义，就
 算他实际上也组织成一个层次结构，你都不好完整地理解它。比如我给你一句简单的话：
 
-        如果维特根中心斯坦的中间序列对他的反身代谢逻辑弧构成一个不来梅等比逻辑，
-        那么这个中间序列对这个逻辑弧的几何重心具有溶解性质。
+  如果维特根中心斯坦的中间序列对他的反身代谢逻辑弧构成一个不来梅等比逻辑，
+  那么这个中间序列对这个逻辑弧的几何重心具有溶解性质。
 
 虽然这个表述倒是很短，但里面每个概念都要看很长的一个定义你才知道他说什么，这就
 很难看懂了。
@@ -222,12 +212,12 @@ Atomic的名上面。
 .. code-block:: python
 
   def the_action(object):
-    if object is CAT:
-      play("喵")
-    else if object is MOUSE:
-      play("吱")
-    else
-      play("咕噜咕噜")
+  if object is CAT:
+  play("喵")
+  else if object is MOUSE:
+  play("吱")
+  else
+  play("咕噜咕噜")
 
 这里def定义了一个函数，这个函数的输入是一个object，它对object进行判断，如果这个
 object是只猫，就播放“喵”这个声音，如果是老鼠，就播放“吱”这个声音，否则，就播放“
@@ -274,18 +264,18 @@ mnist，用101700个参数表达对一组时尚物品图标的认知：
 
 在Tractatus中，如果你整个逻辑判断模型是：
 
-        | 这是狗，它会叫，会吃，会生后代，可以豢养
+  | 这是狗，它会叫，会吃，会生后代，可以豢养
 
 然后你还有一个判断模型：
 
-        | 这是猫，它会叫，会吃，会生后代，可以豢养
+  | 这是猫，它会叫，会吃，会生后代，可以豢养
 
 对于Tractatus来说，这就是同一个东西，我判断不了你当时看见这种东西那个POIS是什么
 ，但在你这个逻辑世界中，这就是同一个东西。
 
 而道德经不是这样想这个问题的，道德经一直想的是，你认为：
 
-        | 这是X，它会叫，会吃，会生后代，可以豢养
+  | 这是X，它会叫，会吃，会生后代，可以豢养
 
 这个概念现在是这样的，它一直是这样吗？它发展起来的规律是什么样的？如果人们开始
 因此定义了“狗肉好吃”，那么这些条件就不会是这些条件，我们会从那个集合中抽取其他
@@ -334,15 +324,15 @@ Complex的真假了。如果所有的Complex都是通过真值函数来组合的
 
 另一个值得关注的问题是可能性。这个问题对于中国人来说也非常有趣。对于西方人来说，
 
-        **If** I work hard, **then** I will be promoted.
+  **If** I work hard, **then** I will be promoted.
 
 如果把I work hard定义为p，I am promoted定义为q，那么这句话在逻辑上表示为：
 
-        p->q
+  p->q
 
 念做“p imply q”。它和“~p v q”是等价的。所以，在英文中，上面这句话可以这样说：
 
-        **Either** I don't work hard，**or** I am promoted.
+  **Either** I don't work hard，**or** I am promoted.
 
 这背后是这样一张真值表（T表示True，F表示False，v表示or）：
 
@@ -420,17 +410,16 @@ Truth-possibility（4.4 4）。
 :doc:`../概念空间分析/alloy`
 ，我觉得理解Alloy的原理，很多维特根斯特的概念就变得非常直白了。
 
-独立讨论主题
-============
+## 独立讨论主题
 
 .. toctree::
-   :maxdepth: 1
-   :caption: 主题：
+  :maxdepth: 1
+  :caption: 主题：
 
-   1
-   2
-   3
-   4
-   5
-   6
-   7
+  1
+  2
+  3
+  4
+  5
+  6
+  7

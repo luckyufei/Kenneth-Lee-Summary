@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2017-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 怎样做代码Review
-****************
 
 Review是极为重要的代码质量工艺。本文介绍这个工艺步骤的执行要领。
 
@@ -52,45 +47,45 @@ Review这个事情一样，说的时候，都说“Review”很重要，实际�
 1. 不通过Review发现UT可以发现的问题，不用Review取代UT
 
 2. Review的评审重点是语义逻辑（包括错误的函数语义理解，错误的名称定义，错误的
-   Comment，错误的Assert，都是），代码构架（比如是否有冗余，分层是否错误，和上
-   级设计是否对应得上等），统计，跟踪，异常等处理逻辑在业务上的正确性，还有缺少
-   的功能，可靠性，可维护性，可测试性等“反面理解”的问题。
+  Comment，错误的Assert，都是），代码构架（比如是否有冗余，分层是否错误，和上
+  级设计是否对应得上等），统计，跟踪，异常等处理逻辑在业务上的正确性，还有缺少
+  的功能，可靠性，可维护性，可测试性等“反面理解”的问题。
 
 3. 基于2，所以Review采用广度优先遍历，而不是深度优先遍历（UT才采用深度优先遍历
-   ）。也就是说，看完一个函数，再看下一个函数，而不跟随到那个函数的下面。
+  ）。也就是说，看完一个函数，再看下一个函数，而不跟随到那个函数的下面。
 
 比如下面这个函数：::
 
-        /**
-         *  prot_autoc_read_82599 - Hides MAC differences needed for AUTOC read
-         *  @hw: pointer to hardware structure
-         *  @locked: Return the if we locked for this read.
-         *  @reg_val: Value we read from AUTOC
-         *
-         *  For this part (82599) we need to wrap read-modify-writes with a possible
-         *  FW/SW lock.  It is assumed this lock will be freed with the next
-         *  prot_autoc_write_82599().  Note, that locked can only be true in cases
-         *  where this function doesn't return an error.
-         **/
-        static s32 prot_autoc_read_82599(struct ixgbe_hw *hw, bool *locked,
-                                         u32 *reg_val)
-        {
-                s32 ret_val;
+  /**
+  *  prot_autoc_read_82599 - Hides MAC differences needed for AUTOC read
+  *  @hw: pointer to hardware structure
+  *  @locked: Return the if we locked for this read.
+  *  @reg_val: Value we read from AUTOC
+  *
+  *  For this part (82599) we need to wrap read-modify-writes with a possible
+  *  FW/SW lock.  It is assumed this lock will be freed with the next
+  *  prot_autoc_write_82599().  Note, that locked can only be true in cases
+  *  where this function doesn't return an error.
+  **/
+  static s32 prot_autoc_read_82599(struct ixgbe_hw *hw, bool *locked,
+  u32 *reg_val)
+  {
+  s32 ret_val;
 
-                *locked = false;
-                /* If LESM is on then we need to hold the SW/FW semaphore. */
-                if (ixgbe_verify_lesm_fw_enabled_82599(hw)) {
-                        ret_val = hw->mac.ops.acquire_swfw_sync(hw,
-                                                IXGBE_GSSR_MAC_CSR_SM);
-                        if (ret_val)
-                                return IXGBE_ERR_SWFW_SYNC;
+  *locked = false;
+  /* If LESM is on then we need to hold the SW/FW semaphore. */
+  if (ixgbe_verify_lesm_fw_enabled_82599(hw)) {
+  ret_val = hw->mac.ops.acquire_swfw_sync(hw,
+  IXGBE_GSSR_MAC_CSR_SM);
+  if (ret_val)
+  return IXGBE_ERR_SWFW_SYNC;
 
-                        *locked = true;
-                }
+  *locked = true;
+  }
 
-                *reg_val = IXGBE_READ_REG(hw, IXGBE_AUTOC);
-                return 0;
-        }
+  *reg_val = IXGBE_READ_REG(hw, IXGBE_AUTOC);
+  return 0;
+  }
 
 Review这个代码，很多人看到ixgbe_verify_lesm_fw_enabled_82599(hw)就想着跟过去看
 看那个流程有没有问题。但你不是计算机，你执行它干什么？你要做的是，判断这里说
@@ -105,7 +100,7 @@ void * 这种类型选择，如果考虑到代码是可以运行在多个硬件�
 
 还有注释，我这个例子是在Linux主线代码中随便拷出来的，它的注释就有错。::
 
-        @locked: Return the if we locked for this read.
+  @locked: Return the if we locked for this read.
 
 Return the是什么鬼意思？
 
@@ -119,7 +114,7 @@ Return the是什么鬼意思？
 2. 先由作者做一个代码介绍，按广度优先遍历整个代码，全体参与需要5-10个小时
 
 3. （可选）如果代码足够复杂，可以下来再做一次个人Review，时间上我没有经验，而且
-   一旦离开会场，这些人看不看难说得很
+  一旦离开会场，这些人看不看难说得很
 
 4. 汇总会议，记录下所有的问题
 

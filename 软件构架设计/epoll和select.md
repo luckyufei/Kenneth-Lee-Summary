@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 epoll和select
-**************
 
 前两天看到一个推送，介绍epoll的原理的，我觉得是个挺好的例子，可以用来说明“错误
 的软件架构分析”是什么样的。但我这里不拉仇恨，不放那个链接，我只通过一个正面的描
@@ -122,11 +117,11 @@ fs/select.c中，一个实现在fs/eventpoll.c中。但两者都是以fd的file-
 
 poll接口的语义要求是这样的：::
 
-    unsigned int poll(struct file *file, poll_table *wait);
+  unsigned int poll(struct file *file, poll_table *wait);
 
 它要求每个实现者都主动调用下面这个函数：::
 
-    static inline void poll_wait(struct file *file, wait_queue_head_t * wait_address, poll_table *wait);
+  static inline void poll_wait(struct file *file, wait_queue_head_t * wait_address, poll_table *wait);
 
 它要求poll的实现者在这个函数中返回的时候，检查对应文件实体的状态，然后返回是可
 读可写还是错误。

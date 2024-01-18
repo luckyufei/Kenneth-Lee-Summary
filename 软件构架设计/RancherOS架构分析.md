@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2017-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 RancherOS架构分析
-******************
 
 最近开始在我们的平台上支持RancherOS，本文对RancherOS的系统架构进行一个分析。
 

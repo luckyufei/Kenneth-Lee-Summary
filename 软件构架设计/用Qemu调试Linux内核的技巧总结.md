@@ -1,12 +1,5 @@
-.. Kenneth Lee 版权所有 2022
-
-:Authors: Kenneth Lee
-:Version: 0.1
-:Date: 2022-06-12
-:Status: Draft
-
+        
 用Qemu调试Linux内核的技巧总结
-*****************************
 
 介绍
 ====
@@ -17,8 +10,7 @@
 ，主要是给做相似工作的人提供一个开发方向，说明这个方向是可行的。这也是这个总结
 放在“架构设计”专栏中的原因。
 
-打点和日志
-==========
+## 打点和日志
 
 Qemu可以用-d产生各种各样的事件跟踪，产生日志以后，用脚本可以发现各种Pattern，进而发现问题
 在哪里。
@@ -88,9 +80,9 @@ in_asm只是翻译过程，要跟踪运行序列还是要看Trace记录，再用
 打出复杂的日志来，比如这样：::
 
   qemu_log(char *str) {
-    __asm__ __volatile__ {
-      my_debug_insn
-    }
+  __asm__ __volatile__ {
+  my_debug_insn
+  }
   }
 
 当然上面只是个例子，这些写其实不那么安全，因为gcc不一定保留str的寄存器到你的嵌
@@ -125,8 +117,7 @@ in_asm只是翻译过程，要跟踪运行序列还是要看Trace记录，再用
 
 BUG(), WARN()这些函数，都可以换成debug指令，这样进入异常情形都可以跟踪起来。
 
-状态跟踪
-========
+## 状态跟踪
 
 内核什么时候在关中断状态，什么时候是在prempt状态，在什么线程，是否在调度，这些
 状态我们不一定立即知道，这些全都可以通过调试指令写给qemu，qemu做-d exec的跟踪就
@@ -144,28 +135,27 @@ BUG(), WARN()这些函数，都可以换成debug指令，这样进入异常情�
 
 Trace后面随时可以根据后面的掩码状态判断当前CPU和OS的运行状态。
 
-调用栈上埋跟踪信息
-==================
+## 调用栈上埋跟踪信息
 
 遇到断点以后，经常会发现某个锁的状态不对，但之前的锁已经用过了，如果我们每次用
 锁的时候都打印，这就会有无数打印，而且对不上哪个实例。更简单的方法，是在堆栈中
 埋上这个信息，比如下面这个代码：::
 
   outter_layer_function() {
-    lock(a);
-    inner_layer_function();
+  lock(a);
+  inner_layer_function();
   }
 
 我们的断点在层层深入的inner_layer_function()中，我们现在想支持lock(a)是谁，那可
 以这样写：::
 
   outter_layer_function() {
-    volatile struct debug_var {
-      int magic=0x1010101;
-      void * data = a;
-    };
-    lock(a);
-    inner_layer_function();
+  volatile struct debug_var {
+  int magic=0x1010101;
+  void * data = a;
+  };
+  lock(a);
+  inner_layer_function();
   }
 
 这样就可以回溯堆栈，通过magic找到a的内容。这种技巧可以用在各种动态调试上。

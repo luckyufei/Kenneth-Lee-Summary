@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2017-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Linux发行版的库软件包组织
-**************************
 
 本文回答有同事问到的Linux的libxxx,libxxx-dbg和libxxx-dev软件包到底有什么关系。
 

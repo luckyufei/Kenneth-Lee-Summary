@@ -1,11 +1,5 @@
-.. Kenneth Lee 版权所有 2021
-
-:Authors: Kenneth Lee
-:Version: 1.0
-:Date: 2021-06-03
-
+      
 Linux内核页表
-***************
 
 本文分析Linux内核页表的概念空间。
 
@@ -56,10 +50,10 @@ PPN2比VPN2大得多，这一点问题没有，因为你又不是只有一个进
 
 .. code-block:: c
 
-   pt_l2 = pt_l3[VPN3].ppn
-   pt_l1 = pt_l2[VPN2].ppn
-   pt_l0 = pt_l1[VPN1].ppn
-   pte   = pt_l0[VPN0].ppn
+  pt_l2 = pt_l3[VPN3].ppn
+  pt_l1 = pt_l2[VPN2].ppn
+  pt_l0 = pt_l1[VPN1].ppn
+  pte   = pt_l0[VPN0].ppn
 
 最后的pte的ppn拼上offset就是确切的物理地址了。
 
@@ -84,48 +78,48 @@ XXX[]表示这个页表项组成的页表。
 其中：
 
 XXX_val(XXX)/__XXX(val)
-        把XXX当作值使用和把值当作XXX来使用。
+  把XXX当作值使用和把值当作XXX来使用。
 
 XXX_none(XXX);
-        检查XXX项是否有效，也就是它的下一级页表是否被分配了。
+  检查XXX项是否有效，也就是它的下一级页表是否被分配了。
 
 XXX_present/bad(XXX);
-        检查XXX指向的页是否存在（有没有被交换出去），present和bad互相取反。
-        none和bad很相似，但none表示这个值压根就没有填，下一级页表就没有分配，而
-        bad表示这个值无效，但下一级页表是存在的。
+  检查XXX指向的页是否存在（有没有被交换出去），present和bad互相取反。
+  none和bad很相似，但none表示这个值压根就没有填，下一级页表就没有分配，而
+  bad表示这个值无效，但下一级页表是存在的。
 
 XXX_leaf(XXX);
-        检查XXX是否是最后一级页表的页表项
+  检查XXX是否是最后一级页表的页表项
 
 XXX_offset(YYY, va);
-        求va在这个页表上的那个项目的指针。
-        *注意了，不是求偏移，而是求XXX自身。*
+  求va在这个页表上的那个项目的指针。
+  *注意了，不是求偏移，而是求XXX自身。*
 
 set_XXX(XXX*, XXX)
-        在一个XXX[n]上设置一个XXX。
+  在一个XXX[n]上设置一个XXX。
 
 clear_XXX(XXX*)
-        在一个XXX[n]上清除一个XXX，但不会释放对应的内存。
+  在一个XXX[n]上清除一个XXX，但不会释放对应的内存。
 
 XXX_alloc(mm, YYY, va);
-        分配XXX[]
-        这个函数会考虑在核间同步的问题，所以你不要直接用他们操作和IO相关的页表。
-        这也意味这，这组函数不是给IO或者IOMMU等子系统用的。
+  分配XXX[]
+  这个函数会考虑在核间同步的问题，所以你不要直接用他们操作和IO相关的页表。
+  这也意味这，这组函数不是给IO或者IOMMU等子系统用的。
 
 pfn_XXX(XXX, prot)
-        从pfn求XXX
+  从pfn求XXX
 
 XXX_pfn(pfn)
-        从XXX球pfn
+  从XXX球pfn
 
 XXX_page_vaddr(XXX)
-        从XXX求下一级页表的虚拟地址
+  从XXX求下一级页表的虚拟地址
 
 pfn_pte(pte)/pfn_pte(pfn, prot)
-        从pte求pfn（包括所有层级连在一起的结果），或者反过来。
+  从pte求pfn（包括所有层级连在一起的结果），或者反过来。
 
 pte_read/write/exec/hugh/dirty...(pte)
-        检查pte属性。
+  检查pte属性。
 
 pte_mkread/mkwrite/mkexec/mkhugh/mkdirty...(pte)
-        设置pte属性。
+  设置pte属性。

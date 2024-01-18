@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Multiarch概念调查
-*****************
 
 由于设计需要，花了一点时间调查了一下Multiarch的概念，作为笔记放在这里。
 

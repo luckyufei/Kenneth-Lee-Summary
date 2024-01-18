@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 nvdimm AD模式的内核应用模型
-***************************
 
 本文用于相关考虑展开第一层逻辑，作者只花了几个小时查看相关资料，里面的判断不一
 定是对的，欢迎在读者参与讨论，并指出其中的错漏。
@@ -43,7 +38,7 @@ nvdimm对此进行了另一层封装，称为BTT，block translation table。BTT
 用户态程序通过libnvdimm对上述访问进行封装，主要提供helpper函数支持上述概念的访
 问。现在这个支持已经扩大了，形成了一组开发库：
 
-        pmem.io: PMDK
+  pmem.io: PMDK
 
 我们再花点时间讨论一下MM模式。有人想着把nvdimm用做普通内存，但很难接受它这么慢
 ，考虑把这个问题推给NUMA，把nvdimm的内存放到另一个NUMA节点上。但这就算不上是一

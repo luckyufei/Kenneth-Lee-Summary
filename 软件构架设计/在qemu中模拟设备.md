@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.1
-
+    
 在qemu中模拟设备
-*****************
 
 介绍
 ====
@@ -29,7 +24,7 @@ qemu的设备模拟原理很简单，可以很快上手，是值得SoC软件工�
 说起来，我觉得Qemu比Linux Kernel还是容易很多的。作为最基础的原理，我原来写过一
 个演示性的例子：
 
-        https://github.com/nekin2017/pipeline_simulator.git
+  https://github.com/nekin2017/pipeline_simulator.git
 
 那个只写了几个小时，当然并不实用，但用来说明模拟器是什么已经足够了。这一定程度
 上说明，模拟器在原理上并不复杂。
@@ -40,18 +35,18 @@ Qemu要解决具体问题，相对当然复杂得多，但得益于良好的封�
 
 .. code-block:: python
 
-   def run_a_guest():
-     vm = create_vm()
-     vm.create_cpu_object()
-     vm.create_device_object()
-     for cpu in cpus: create_thread(cpu_thread, cpu)
+  def run_a_guest():
+  vm = create_vm()
+  vm.create_cpu_object()
+  vm.create_device_object()
+  for cpu in cpus: create_thread(cpu_thread, cpu)
 
-   def cpu_thread(cpu):
-     while true:
-       try:
-         cpu.run(vm)
-       except EIO eio:
-         find_device(eio.io_address).handle_io();
+  def cpu_thread(cpu):
+  while true:
+  try:
+  cpu.run(vm)
+  except EIO eio:
+  find_device(eio.io_address).handle_io();
 
 对很多人来说，那个cpu.run()是最难理解的，在Qemu中有各种各样的实现方式，比如基于
 qemu.ko的，基于TCG（翻译执行），或者基于KVM的。但对于做设备的人来说，这些统统不
@@ -64,19 +59,17 @@ ioctl(KVM_RUN)就好了。
 而这个设备处理的整个过程，其实就是qemu这个进程在运行，这和一个普通的操作系统的
 进程编程环境没有任何不同，完全就是响应IO空间的读写操作而已。这样一想，是不是其
 实很简单？
-
-
-增加设备驱动
-============
+  
+## 增加设备驱动
 
 首先，我们要能够重新编译qemu，这随便上网一搜就是一大把，我在Ubuntu@x86_64上模拟
 ARM aarch64，编译命令如下（我验证的时候最新的stable版本是2.9）：::
 
-        git clone git://git.qemu.org/qemu.git
-        apt-get build-deps qemu #安装开发库
-        cd qemu
-        ./configure #如果喜欢，可以自己挑选具体要什么特性
-        make
+  git clone git://git.qemu.org/qemu.git
+  apt-get build-deps qemu #安装开发库
+  cd qemu
+  ./configure #如果喜欢，可以自己挑选具体要什么特性
+  make
 
 先确认你可以编译过，这样我们加东西的基础就有了。（现在的版本使用了submodule，你
 还需要更新submodule，submodule的原理可以看这里：《:doc:`git-submodule的理解` 》
@@ -97,18 +90,17 @@ ARM aarch64，编译命令如下（我验证的时候最新的stable版本是2.9
 义空间如下：
 
 Type/Class
-        一种设备类型（相当于Java中的Class）
+  一种设备类型（相当于Java中的Class）
 
 Instance
-        一个设备实例（相当于Java中的Object)
+  一个设备实例（相当于Java中的Object)
 
 通常你在Instance的初始化函数中申请一些MemoryRegion，注册你的IO空间被访问的回调
 函数，问题就基本解决了）
 
-        | 注：更多信息，参考后面的QOM一节。
+  | 注：更多信息，参考后面的QOM一节。
 
-创建设备
-=========
+## 创建设备
 
 增加设备驱动仅仅是表明这个设备可以被创建了，还没有创建。设备由“机器”来定义，就
 是你用-machine xxxx指定的那个东西。这也是一个驱动，比如我们在ARM平台上常用virt
@@ -118,19 +110,19 @@ qemu/hw/riscv/virt.c。
 这个也基本上不用学，你仿照其他设备那样创建一个设备就可以了。一般包括两个动作：
 
 1. 在某个总线下面创建设备，比如在系统总线上创建设备，我们可以：
-   sysbus_create_simple(驱动的名字，IO地址，IRQ编号)。
+  sysbus_create_simple(驱动的名字，IO地址，IRQ编号)。
 
 2. 创建dts或者acpi入口，这个都有标准函数，比如qemu_fdt_add_subnode()。
 
 代码示意如下：
 
-        .. code-block:: c
+  .. code-block:: c
 
-        dev = qdev_new(设备类型);
-        ... // 设置dev其他属性
-        sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-        sysbus_connect_irq(dev, i, irq)... //注册每个irq
-        memory_region_add_subregion(get_system_memory(), base, sysbus_mmio_get_region(s, 0)); //注册mmio空间
+  dev = qdev_new(设备类型);
+  ... // 设置dev其他属性
+  sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+  sysbus_connect_irq(dev, i, irq)... //注册每个irq
+  memory_region_add_subregion(get_system_memory(), base, sysbus_mmio_get_region(s, 0)); //注册mmio空间
 
 通用平台设备和PCIE桥也是一种特殊的设备，方法是一样的。
 
@@ -138,10 +130,8 @@ qemu/hw/riscv/virt.c。
 
 这是静态的，动态的可以通过在命令行用-device来分配，这个读者自己去摸吧，基本原理
 基本是一样的。
-
-
-trace
-======
+  
+## trace
 
 一般调试这种驱动我们都不直接打印（因为虚拟机还需要占用控制台呢。不过你不在于打
 印混合在一起，直接打印是没有问题的），所以我们都用trace，trace可以通过qemu命令
@@ -158,10 +148,8 @@ trace-events文件，里面描述你的函数原形，然后在你的主程序�
 
 但仅仅trace需要这样，你不用trace就不需要，简单修改对应目录的Makefile.objs就可以
 了。
-
-
-MemoryRegion
-=============
+  
+## MemoryRegion
 
 好了，前面都是比较简单的东西，最后我们重点理解一下qemu的MemoryRegion的概念。我
 们刚才说了，硬件模拟无外乎两个东西，一个是中断，一个是IO访问。
@@ -170,36 +158,36 @@ MemoryRegion
 存区会麻烦很多，所以我们需要多介绍一些概念：
 
 MemoryRegion
-        这表示一组面向Guest的，具有相同属性的内存区。后面简称MR。系统有全局的总
-        MR，你直接用get_system_memory()就可以拿到了。所以你实际上任何时候都可以
-        访问全局任何内存。
+  这表示一组面向Guest的，具有相同属性的内存区。后面简称MR。系统有全局的总
+  MR，你直接用get_system_memory()就可以拿到了。所以你实际上任何时候都可以
+  访问全局任何内存。
 
 MemoryRegionCache
-        这表示一片为了满足Guest需要的一片临时的“真内存”。换句话说，MemoryRegion
-        是描述一片内存区，MemoryRegionCache是真的要用的内存，Hypervisor根据需要
-        动态申请，后面简称MRC。如果你不是要深入定制，一般你不管这个东西没有任何
-        问题。
+  这表示一片为了满足Guest需要的一片临时的“真内存”。换句话说，MemoryRegion
+  是描述一片内存区，MemoryRegionCache是真的要用的内存，Hypervisor根据需要
+  动态申请，后面简称MRC。如果你不是要深入定制，一般你不管这个东西没有任何
+  问题。
 
 AddressSpace
-        这表示一个地址空间，一个地址空间可以包含多个不同属性的MR。后面简称AS。
-        AS是和MR直接对应的，所以你可以直接用address_space_memory拿到对应
-        get_system_memory()的AS。
+  这表示一个地址空间，一个地址空间可以包含多个不同属性的MR。后面简称AS。
+  AS是和MR直接对应的，所以你可以直接用address_space_memory拿到对应
+  get_system_memory()的AS。
 
 FlatView
-        这表示看到的地址空间。这就比较绕了。这么说：AS是立体的，里面的MR是相互
-        独立的，他们可以交叠，转义，动态开关等。但当你去访问的时候，某个时刻，
-        某个物理地址总是对应着某个MR中的地址，FlatView用来表示层叠的结果。后面
-        这个简称FV。FV大部分时候写设备模拟的时候都不用管，它是用于深入处理Host
-        这边访问内存的时候用的，比如通过address_space_to_flatview(as)把as换成fv
-        ，然后用flatview_read/write()进行本地内存访问。
+  这表示看到的地址空间。这就比较绕了。这么说：AS是立体的，里面的MR是相互
+  独立的，他们可以交叠，转义，动态开关等。但当你去访问的时候，某个时刻，
+  某个物理地址总是对应着某个MR中的地址，FlatView用来表示层叠的结果。后面
+  这个简称FV。FV大部分时候写设备模拟的时候都不用管，它是用于深入处理Host
+  这边访问内存的时候用的，比如通过address_space_to_flatview(as)把as换成fv
+  ，然后用flatview_read/write()进行本地内存访问。
 
 MR可以有很多类型，其中前面提到的都是IO类型的，这种算是最简单的。它的实际地址在
 创建设备的时候给定，而在设备驱动只要在instance的初始化函数中，从传入的系统总线
 对象中就可以拿到了。一般方法是：::
 
-        memory_region_init_io(&iomr, owner, ops, priv, name, size);
+  memory_region_init_io(&iomr, owner, ops, priv, name, size);
 
-        sysbus_init_mmio(sys_bus_device, &iomr);
+  sysbus_init_mmio(sys_bus_device, &iomr);
 
 这样你就有了一个mr对象，Guest的访问由ops的读写函数来响应。
 
@@ -214,31 +202,29 @@ address_space_memory是个全局变量，就是整个虚拟机的AS。反正整�
 
 Qemu提供了一种特殊的Region：::
 
-        memory_region_init_iommu(&iommumr, instance_size, mrtypename, owner, name, size);
+  memory_region_init_iommu(&iommumr, instance_size, mrtypename, owner, name, size);
 
 iommumr是我们要创建的MR内存，instance_size是它的大小，size是这个这个翻译器的输
 入地址的范围（iova的范围），其他域可以直接理解。唯一比较麻烦的是这个mrtypename
 。这个东西需要再创建一个父类是TYPE_IOMMU_MEMORY_REGION的新设备类型，例如这样：::
 
-        static const TypeInfo rc4030_iommu_memory_region_info = {
-            .parent = TYPE_IOMMU_MEMORY_REGION,
-            .name = TYPE_RC4030_IOMMU_MEMORY_REGION,
-            .class_init = rc4030_iommu_memory_region_class_init,
-        };
+  static const TypeInfo rc4030_iommu_memory_region_info = {
+  .parent = TYPE_IOMMU_MEMORY_REGION,
+  .name = TYPE_RC4030_IOMMU_MEMORY_REGION,
+  .class_init = rc4030_iommu_memory_region_class_init,
+  };
 
 然后在class_init中给这个域创建一组用于翻译的函数就可以了。其中最核心的显然是其
 中的translate函数了。我们简单看看它的API定义：::
 
-        IOMMUTLBEntry translate(IOMMUMemoryRegion *iommu, hwaddr addr, IOMMUAccessFlags flag, int iommu_idx);
+  IOMMUTLBEntry translate(IOMMUMemoryRegion *iommu, hwaddr addr, IOMMUAccessFlags flag, int iommu_idx);
 
 iommu是操作上下文，addr是物理地址，flag是访问属性，iommu_idx用来给你区分实例。
 其实我觉得如果用来做软件的设备模拟，这玩意儿用不上，还不如用我前面说的，需要访
 问的时候自己翻译好了。
 
 剩下的问题可能是花几个小时试一试了。
-
-
-
+  
 QOM
 ====
 
@@ -292,30 +278,30 @@ interface定义的空间在创建类的时候都会在本类中占据一个空�
 
 我们先看一个简单的例子建立感性认识：::
 
-        typedef DeviceClass MyDeviceClass;
-        typedef struct MyDeviceState { //这个定义类的实例的数据
-          DeviceState parent; //包含父类的State数据，而且必须保证在第一个位置上
-          type my_own_data;...
-        } MyDevice;
-        static const TypeInfo my_device_info = {
-          .name = "mydevice",
-          .parent = TYPE_DEVICE, // "device"
-          .instance_size = SIZEOF(MyDevice);  //State数据的大小
-          .interfaces = (InterfaceInfo[]) {  //一组接口
-              { TYPE_HOTPLUG_HANDLER },
-              { TYPE_ACPI_DEVICE_IF },
-              { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-              { }
-            }
-        };
+  typedef DeviceClass MyDeviceClass;
+  typedef struct MyDeviceState { //这个定义类的实例的数据
+  DeviceState parent; //包含父类的State数据，而且必须保证在第一个位置上
+  type my_own_data;...
+  } MyDevice;
+  static const TypeInfo my_device_info = {
+  .name = "mydevice",
+  .parent = TYPE_DEVICE, // "device"
+  .instance_size = SIZEOF(MyDevice);  //State数据的大小
+  .interfaces = (InterfaceInfo[]) {  //一组接口
+  { TYPE_HOTPLUG_HANDLER },
+  { TYPE_ACPI_DEVICE_IF },
+  { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+  { }
+  }
+  };
 
-        //后面玩的是个__attribute__((constructor))游戏，自动全局注册这个类型而已
-        static void my_device_register_types(void) {
-          type_register_static(&my_device_info);
-        }
-        type_init(my_device_register_types)
-        //这一段可以通过提供一个TypeInfo的数组这样定义:
-        //DEFINE_TYPES((devinfo_array)
+  //后面玩的是个__attribute__((constructor))游戏，自动全局注册这个类型而已
+  static void my_device_register_types(void) {
+  type_register_static(&my_device_info);
+  }
+  type_init(my_device_register_types)
+  //这一段可以通过提供一个TypeInfo的数组这样定义:
+  //DEFINE_TYPES((devinfo_array)
 
 首先我们可以看到，Type是全局静态定义的。通过TypeInfo来描述对这个类的要求。如果
 在类上就有数据，可以给定TypeInfo.class_size（注意也要在最前面包含父类的State结

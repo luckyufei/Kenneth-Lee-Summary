@@ -1,12 +1,5 @@
-.. Kenneth Lee 版权所有 2021
-
-:Authors: Kenneth Lee
-:Version: 1.0
-:Date: 2021-10-13
-:Status: Draft
-
+        
 RISCV中断方案分析
-*****************
 
 写这个文档是因为看别人写的一个RISCV的中断控制器的总结，觉得隔靴搔痒，我通过重新
 写一个说明这种分析应该怎么抓要点。
@@ -17,9 +10,9 @@ RISCV中断方案分析
 RISCV现在主要有三个中断控制器方案。一个是Sifive的FU540，FU740用的方案，我根据这
 个两个定义：
 
-        https://starfivetech.com/uploads/fu540-c000-manual-v1p4.pdf
+  https://starfivetech.com/uploads/fu540-c000-manual-v1p4.pdf
 
-        https://www.starfivetech.com/uploads/fu740-c000-manual-v1p2.pdf
+  https://www.starfivetech.com/uploads/fu740-c000-manual-v1p2.pdf
 
 来抽象这个方案的特点。
 

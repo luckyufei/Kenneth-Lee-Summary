@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 ARM NUC
-********
 
 上周刚参加完Linaro Connect BKK19，有很多独立的逻辑链需要建，其中ARM Server开发
 者生态运营这个主题是比较开放的，我在这里公开讨论吧。只是把逻辑链组织一下，不代
@@ -54,7 +49,7 @@ Cocionext的SynQuacer了，但对一般开发者来说，这个性能还是没�
 
 .. figure:: _static/synquacer.jpg
 
-   SynQuacer内部结构
+  SynQuacer内部结构
 
 演讲302构想了一种开发者用机需求：
 
@@ -72,25 +67,25 @@ PCIE插槽的显示设备，应该也不是太难的事情。
 演讲302中提到上个月Linus的一个评价，我在网上搜索了一下，没有找到原始出处，但
 zdnet上的完整表述是这样的：
 
-        | Some people think that "the cloud" means that the instruction
-        | set doesn't matter. Develop at home, deploy in the cloud.
-        | That's bull***t. If you develop on x86, then you're going to 
-        | want to deploy on x86, because you'll be able to run what you 
-        | test "at home" (and by "at home" I don't mean literally in your 
-        | home, but in your work environment.
-        |
-        | Which means that you'll happily pay a bit more for x86 cloud
-        | hosting, simply because it matches what you can test on your own
-        | local setup, and the errors you get will translate better.
-        |
-        | This is true even if what you mostly do is something ostensibly 
-        | cross-platform like just run perl scripts or whatever. Simply 
-        | because you'll want to have as similar an environment as possible, 
-        | Which in turn means that cloud providers will end up making more
-        | money from their x86 side, which means that they'll prioritize it,
-        | and any ARM offerings will be secondary and probably relegated to
-        | the mindless dregs (maybe front-end, maybe just static html, that
-        | kind of stuff).
+  | Some people think that "the cloud" means that the instruction
+  | set doesn't matter. Develop at home, deploy in the cloud.
+  | That's bull***t. If you develop on x86, then you're going to 
+  | want to deploy on x86, because you'll be able to run what you 
+  | test "at home" (and by "at home" I don't mean literally in your 
+  | home, but in your work environment.
+  |
+  | Which means that you'll happily pay a bit more for x86 cloud
+  | hosting, simply because it matches what you can test on your own
+  | local setup, and the errors you get will translate better.
+  |
+  | This is true even if what you mostly do is something ostensibly 
+  | cross-platform like just run perl scripts or whatever. Simply 
+  | because you'll want to have as similar an environment as possible, 
+  | Which in turn means that cloud providers will end up making more
+  | money from their x86 side, which means that they'll prioritize it,
+  | and any ARM offerings will be secondary and probably relegated to
+  | the mindless dregs (maybe front-end, maybe just static html, that
+  | kind of stuff).
 
 我想我理解Linus的观点，实际上，很多不再写代码的人可能不一定能理解：也许大部分工
 程师都不肯承认，其实现在基本上不让你可以立即运行某个构想，你根本就没有办法判断

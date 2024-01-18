@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2018-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 git的基本架构欣赏
-******************
 
 原来一直黑盒地使用git的基本功能，最近需要频繁地反复整理一个很长的PatchSet，把
 git的基础数据原理看了一下，把主要内容整理在这里。
@@ -27,13 +22,13 @@ git的核心需求是一个文件树版本管理工具。这个事情的本质�
 
 比如说，你创建一个目录树是这样的：::
 
-        ./dir
-        ./dir/file
+  ./dir
+  ./dir/file
 
 你记录它的内容：::
 
-        040000 tree e1b8ecbb1f19709f3a4867a0ffe08bb2e07acf19 dir
-        100644 blob 9daeafb9864cf43055ae93beb0afd6c7d144bfa4 file
+  040000 tree e1b8ecbb1f19709f3a4867a0ffe08bb2e07acf19 dir
+  100644 blob 9daeafb9864cf43055ae93beb0afd6c7d144bfa4 file
 
 用e1b8...作为文件名，放dir的描述，用9dae...作为文件名，放file的内容，这个数据结
 构可以被复现在任何文件系统上，这样这个架构，就会有一个非常坚实的基础，任何时候
@@ -65,10 +60,10 @@ hash-object/update-index/write-tree/commit-tree这样的命令手工建出相关
 所以，正确的推演方向是如何保存commit的链表。根据我们前面的讨论，把commit作为一
 个Object节点去描述就可以了，比如(这是内容，如前所述，索引是内容的SHA1）：::
 
-    tree ae55eac3b5e20d2b924e61a6abfc6a7e47e8bb7f
-    author Kenneth Lee <xxxx> 1529480147 +0800
-    committer Kenneth Lee <xxxx> 1529480147 +0800
-    v1
+  tree ae55eac3b5e20d2b924e61a6abfc6a7e47e8bb7f
+  author Kenneth Lee <xxxx> 1529480147 +0800
+  committer Kenneth Lee <xxxx> 1529480147 +0800
+  v1
 
 commit索引了这个commit的tree，tree里面有它相关的tree和blob，所有内容都关联起来
 了。需求永远都在这个基础上，没有被新的限制左右了方向。
@@ -93,7 +88,7 @@ commit索引了这个commit的tree，tree里面有它相关的tree和blob，所�
 完全变成了：我具有一组包含大量重复数据的文件，如何对其进行压缩保存？这有无数的
 方法可以用，而且完全和主逻辑无关。就像下面这样：
 
-        .. figure:: _static/git2.jpg
+  .. figure:: _static/git2.jpg
 
 这样的优化，我们就可以完全聚焦在“压缩”这个主题上，和object能否被保存在不同的文
 件系统上完全无关了。
@@ -104,11 +99,11 @@ checkout <sha1_of_commit>。给定了commit，就拿到了tree，拿到了tree�
 
 然后我们加一个别名的概念，比如branch和tag的名字，本质就是一个commit:
 
-        .. figure:: _static/git3.jpg
+  .. figure:: _static/git3.jpg
 
 而当前的branch，用HEAD来标识，HEAD是branch的索引：
 
-        .. figure:: _static/git4.jpg
+  .. figure:: _static/git4.jpg
 
 有了这样一个基础结构，后面能想象到的功能，怎么想都只是一个工作量的问题，这就能
 称为良好的架构控制了。

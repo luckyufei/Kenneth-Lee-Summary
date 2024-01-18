@@ -1,22 +1,17 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 从C的for和Python的for聊起
-*************************
 
 熟悉C的人可能会很看不惯Python的for，因为表达能力其实不如C，比如我要做一个1到10
 的循环，用C来表达，就是这样的：::
 
-        for(i=1; i<=10; i++) {
-           do_sth_on(i);
-        }
+  for(i=1; i<=10; i++) {
+  do_sth_on(i);
+  }
 
 很好理解，而用Python，得这样：
 
-        for i in range(1,11):
-          do_sth_on(i)
+  for i in range(1,11):
+  do_sth_on(i)
 
 对C的程序员来说，首先为了一个循环创建一个对象(range)就令人不爽。更重要的是，这
 个控制力不强，你很难在循环中间做动作，比如如果do_sth_on(i)返回错误的时候跳过下
@@ -69,7 +64,7 @@ Dataflow Programming的整个问题有点像TPU：我们知道计算的要求和
 
 之所以要拿这个问题出来借题发挥，其实主要是想讨论这个论文的方案：
 
-        http://pages.cs.wisc.edu/~vinay/pubs/isca-hybrid-arch.pdf。
+  http://pages.cs.wisc.edu/~vinay/pubs/isca-hybrid-arch.pdf。
 
 它的概念本身很简单——EDGE的用途摆在那里是有限的，我们的通用计算大部分时候确实是
 控制流，而不是计算流。既然如此，干脆把EDGE的硬件做成一个和传统超标量通用处理器

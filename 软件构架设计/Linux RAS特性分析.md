@@ -1,15 +1,9 @@
-.. Kenneth Lee 版权所有 2017-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Linux RAS特性分析
-******************
 
 （如果你看到这一行，说明本文仍处于修改状态，内容正在进行逻辑整理和信息确认，非
 常不可靠）
-
-
+  
 介绍
 ====
 
@@ -50,10 +44,8 @@ Documentations/admin-guide/ras.rst，它也仅仅介绍了EDAC子系统，而说
 
 半吊子设计的结果就是一般没有人知道这整个设计的设计逻辑是什么。所以本文尝试基于
 4.13-rc7内核，提取一下Linux内核对RAS的认知模型和支持情况。
-
-
-硬件抽象
-=========
+  
+## 硬件抽象
 
 RAS特性，首先保证的是R。系统挂了，可以重启，但明明应该给我一个2的，你给我一个3
 ，这就不可救药了。所以在硬件设计上，优先保护的是这个R。而R的保护方法是就是在整
@@ -81,8 +73,7 @@ Deferred Error”这种改变表示错误已经被传播出去了。而Linux则�
 中断，只是不同的类型，CPU可以通过给对应的进程发SIGBUS一类的信号来控制这个错误。
 
 这两种方法可以配合起来同时使用，前者用于记录错误，后者用来避免错误被传播。
-
-
+  
 [EDAC]
 
 Linux最早处理异步中断错误的框架叫EDAC，Error Detection And Correction。它包括两
@@ -92,10 +83,10 @@ Linux最早处理异步中断错误的框架叫EDAC，Error Detection And Correc
 ioremap设备的IO空间，注册处理中断，在收到中断以后，从IO空间中读到参数，再调用
 edac的框架报告函数，报告相关的错误：::
 
-        edac_mc_handle_error()
-        edac_raw_mc_handle_error()
-        edac_device_handle_ce()
-        edac_device_handle_ue()
+  edac_mc_handle_error()
+  edac_raw_mc_handle_error()
+  edac_device_handle_ce()
+  edac_device_handle_ue()
 
 这些报告函数主要干这些事：
 
@@ -104,7 +95,7 @@ edac的框架报告函数，报告相关的错误：::
 2. trace_mc_event：把错误写到ftrace的一个跟踪项中
 
 3. 统计：把这个错误报告到根据DIMM条，Rank，Row的分类进行统计，为后续进行硬件替
-   换提供参考
+  换提供参考
 
 4. 如果硬件报这是个UE，而且这个控制器要求UE即停机，则复位系统
 
@@ -114,10 +105,8 @@ trace_xxx是个跟踪，不开跟踪就不能工作，统计不能用于单个�
 
 所以，当我们给Linux实现RAS特性的（硬件的）时候，必须有意识地用page_fault一类的
 异常来控制传播范围，只把中断的报告看作是统计上的补充。
-
-
-ACPI APEI表
-============
+  
+## ACPI APEI表
 
 EDAC是比较原始的实现，需要为每个平台的控制器写独立的驱动。ACPI标准的APEI表从
 BIOS层提供了标准的报告形式。APEI是ACPI Platform Error Interface的缩写，它包括多
@@ -144,8 +133,7 @@ BIOS层提供了标准的报告形式。APEI是ACPI Platform Error Interface的�
 功能。所以，高级的标准的服务器，更应该选择的是走APEI路线，而不是EDAC的路线。
 
 只要硬件提供APEI接口，Linux上就不需要额外的驱动了。
-
-
+  
 MCE
 ====
 
@@ -153,10 +141,8 @@ Linux还有一个传统的报告系统，这个是硬件的概念，所谓Machin
 是用于报告EDAC类似的错误的，但现在这个主要是比如PowerPC用得比较多，在x86上，现
 在这个系统还在，但RAS有关的报告已经大部分被APEI取代了，所以我们基本上现在可以忽
 略它，而聚焦到APEI支持上。
-
-
-异常内存页隔离
-==============
+  
+## 异常内存页隔离
 
 如果我们发现uc的内存问题，一种办法当然可以立即停机。但其实还有一种方法是隔离掉
 这片内存。这个功能依然做在GHES上，ghes_handle_memory_failure()调用
@@ -166,10 +152,8 @@ VM或者进程就会被隔离掉。
 这个功能对比AIX这样的高级货，实在拿不出手，因为这并不能避免错误被传播出去。但对
 一般数据中心来说，可能也够了。对大部分数据中心来说，你能说你这个节点不可信就够
 了，本来也不指望你还能提供内存双备这种不计成本的高级特性来。
-
-
-PCIE总线错误
-=============
+  
+## PCIE总线错误
 
 PCIE总线有自己的错误报告标准，叫AER。实现为PIC配置空间的一个capability。和其他
 EDAC的控制器一样，也实现为IO和中断的形式。我觉得如果做得好的话，它应该被注册为
@@ -181,19 +165,15 @@ AER和EDAC的处理策略几乎和EDAC一样，不同的是，当它发现错误
 
 AER错误现在通过APEI的GHES表收集的，PCIE总线驱动仅仅提供处理的手段。所以，要支持
 PCIE的错误，也需要实现APEI。
-
-
-其他硬件驱动的故障
-===================
+  
+## 其他硬件驱动的故障
 
 其他非规整的硬件，现在基本上都是通过trace_xxxx()这样的方式记录的。比如ARM就使用
 了自己的trace_arm_event()和trace_non_standard_event()，所以，综合起来，全面收集
 所有RAS数据的方法，主要是ftrace接口。也就是说，在服务器上，无论你是否要跟踪，
 ftrace是必开的功能，否则RAS收集程序将无法工作。
-
-
-rasdaemon
-==========
+  
+## rasdaemon
 
 RAS是Linux下一个常用的ras收集器，很多高级服务器当然会提供自己的收集daemon，但原
 理基本上也和rasdaemon差不多。它就是等在ftrace上，创建一个独立的ftrace instance
@@ -210,15 +190,12 @@ RAS是Linux下一个常用的ras收集器，很多高级服务器当然会提供
 * mce
 
 * extlog_mem_event（这是x86 MCE特有的信息）
-
-
-故障注入
-========
+  
+## 故障注入
 
 Linux的故障注入做得很分散，每个独立的功能有自己独立的故障注入方式，AER有AER自己
 的，APEI有APEI自己的，memory的同步故障则通过HWPOISON_INJECT来注入。
-
-
+  
 小结
 ====
 

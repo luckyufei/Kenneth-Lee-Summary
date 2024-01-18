@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 WarpDrive用户态方案重构建议
-***************************
 
 维护WarpDrive用户态部分的兄弟让我总结一下对用户态方案的发展策略建议，这个本来就是
 开放项目，我就懒得发邮件发来发去了，直接在这里写。
@@ -12,7 +7,7 @@ WarpDrive用户态方案重构建议
 现在WarpDrive的开放核心都放在uacce上，保证先可以上传内核再说。在uacce一侧，我们
 在保证的是“让加速器和进程有相同的地址空间”。图示是这样：
 
-        .. figure:: _static/wd.jpg
+  .. figure:: _static/wd.jpg
 
 uacce是维护一个框架，利用MMU和IOMMU的同步，让OS对进程的谎言，同时对加速器中的同
 一进程成立。
@@ -24,18 +19,18 @@ uacce是维护一个框架，利用MMU和IOMMU的同步，让OS对进程的谎�
 
 所以，一种理想的软件方案是这样的：::
 
-        def algo2():
-                data2 = do_algo2_with_uacce_language()
-                return data2
+  def algo2():
+  data2 = do_algo2_with_uacce_language()
+  return data2
 
-        def main_cpu():
-                data1 = algo1()
-                thread = create_acce_thread()
-                start_acce_thread(acce, algo2, data1)
-                data3 = algo3()
-                data2 = thread.join()
-                data = reduce(data2, data3)
-                return data;
+  def main_cpu():
+  data1 = algo1()
+  thread = create_acce_thread()
+  start_acce_thread(acce, algo2, data1)
+  data3 = algo3()
+  data2 = thread.join()
+  data = reduce(data2, data3)
+  return data;
 
 当然，直接这样干最大的问题是编译器要同时认识多种编程语言，但在实际使用的时候只
 要把编译器分开，到链接阶段再结合就好了。不会是非常大的问题。早期阶段我们甚至可
@@ -49,7 +44,7 @@ uacce是维护一个框架，利用MMU和IOMMU的同步，让OS对进程的谎�
 
 我们先用简单的的功能聚合来考量我们的方案，我们可以这样安排接口：
 
-        .. figure:: _static/wd2.jpg
+  .. figure:: _static/wd2.jpg
 
 其中“异构线程库”和“UACCE封装都是”我们说的“公共开发库”。这个看起来最大的问题是“
 异构线程库”太薄了，使用接口的用户又不能只看它，还是要理解加速器的行为。我们其实
@@ -62,9 +57,8 @@ uacce是维护一个框架，利用MMU和IOMMU的同步，让OS对进程的谎�
 1. 仅封装UACCE内核接口
 
 2. 先做好一种加速器的模式，如果有模式类似的，他们自然会聚合的，不需要在没有新加
-   速器引入之前就YY一个接口出来
-
-
+  速器引入之前就YY一个接口出来
+  
 补充1：我解释一下把CPU用作加速器有什么好处。其实我觉得确实也没有什么好处，但如
 果非要找出好处来，其实也是有的，专精的好处是没有调度成本。比如我留两个CPU出来专
 门做浮点加速，那么我的主程序就没有浮点了，这样主程序调度就是是不需要保存FP寄存
@@ -79,17 +73,17 @@ uacce是维护一个框架，利用MMU和IOMMU的同步，让OS对进程的谎�
 2. 如果需要，我们完全可以在没有加速器硬件的时候推演WarpDrive的所有功能。
 
 3. 未来我们做一些专用用途的核，比如带加密扩展指令或者CNN扩展指令的核，这些核可
-   以直接复用这个方案。有兴趣的高校实验室不妨和我们联系，我们觉得这会是一个代表
-   性的未来方向。
+  以直接复用这个方案。有兴趣的高校实验室不妨和我们联系，我们觉得这会是一个代表
+  性的未来方向。
 
 补充2：前面的抽象可能有点高，我说得更接地气一点。简单说，wd现在的架构是这样的：
 
-        .. figure:: _static/wd3.jpg
+  .. figure:: _static/wd3.jpg
 
 有两个模块都需要知道设备的差异，中间的wd统一接口，横插了一杆子，做了一个强制的
 统一，但这种统一并不带来工作量和性能上的有事。所以完全可以变成这样：
 
-        .. figure:: _static/wd4.jpg
+  .. figure:: _static/wd4.jpg
 
 由于加速器可以抽象为一个线程，未来这里的某加速器通讯适配，可以标准化为某种线程
 接口，这就是正文中的异构线程库的意义。但既是没有这个库，UACCE封装还是一样的封装

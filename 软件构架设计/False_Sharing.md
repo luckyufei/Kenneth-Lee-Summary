@@ -1,5 +1,4 @@
 假共享内存(False Sharing)
-**************************
 
 最近定位了一个问题，问题看来对很多写多线程的程序的工程师都有帮助，分享一下。
 
@@ -15,26 +14,26 @@
 
 变化激烈的指标：::
 
-        context-sw: 15k vs 11k
-        cycle: 5b vs 2.7b (1.847GHz)
-        bus_cycle: 5b vs 2b
-        l1d-refill: 20.4m vs 18.7m, 7.4M/s vs 12M/s
-        l1i-refill: 108m vs 86.4m, 39M/s vs 59M/s
-        l2d-refill: 83.4m vs 37.6m
-        l2i-refill: 45.9m vs 16.6m
-        前端stall: 3b vs 1.4b
-        后端stall: 1b vs 0.6b。
-        branch miss: 28m vs 15.8m
-        br_mis_pred: 28m vs 15m
+  context-sw: 15k vs 11k
+  cycle: 5b vs 2.7b (1.847GHz)
+  bus_cycle: 5b vs 2b
+  l1d-refill: 20.4m vs 18.7m, 7.4M/s vs 12M/s
+  l1i-refill: 108m vs 86.4m, 39M/s vs 59M/s
+  l2d-refill: 83.4m vs 37.6m
+  l2i-refill: 45.9m vs 16.6m
+  前端stall: 3b vs 1.4b
+  后端stall: 1b vs 0.6b。
+  branch miss: 28m vs 15.8m
+  br_mis_pred: 28m vs 15m
 
 基本不变的： ::
 
-        inst: 1.5b vs 1.4b
-        l1d_tlb: 800m vs 739m
-        l1i_tlb: 18.9m vs 17.9m
-        exec_ret/exec_taken: 164k vs 144k
-        mem_access: 663m vs 650m
-        pagefault: 0 vs 0
+  inst: 1.5b vs 1.4b
+  l1d_tlb: 800m vs 739m
+  l1i_tlb: 18.9m vs 17.9m
+  exec_ret/exec_taken: 164k vs 144k
+  mem_access: 663m vs 650m
+  pagefault: 0 vs 0
 
 由这个情况推想，程序并没有因为调度到多个核上多走了分支，也没有多访问了内存，但
 总线访问却大幅增加，看起来是因为这些线程间有很多“共享内存”访问，导致了很多的核

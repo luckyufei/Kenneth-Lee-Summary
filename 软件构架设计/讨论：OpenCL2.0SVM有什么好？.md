@@ -1,17 +1,12 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 讨论：OpenCL2.0SVM有什么好？
-****************************
 
 我不是专职做异构计算的，只是做平台，我看很多人对NV或者OpenCL形态的SVM颇有好感，
 但我想不明白，我把我的逻辑组织出来，看看别人怎么看这个问题。
 
 OpenCL设想的异构计算模型是这样的：
 
-        .. figure:: _static/opencl模型.jpg
+  .. figure:: _static/opencl模型.jpg
 
 就是说，我准备数据是在Host一侧的，数据也在内存中，我的数据准备好了，但要做计算
 ，Host的计算子系统不合适，我改用设备计算子系统来做。一种选择是设备计算子系统直

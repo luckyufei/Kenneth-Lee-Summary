@@ -1,105 +1,100 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 从CPU和TPU的不同语言抽象看抽象原则
-***********************************
 
 最近和人讨论CPU和TPU的语言抽象，把一些总结整理在这里。
 
 CPU的语言是个时间模型，我随便拷贝一段Linux的代码来作为例子：::
 
 	static __always_inline long __get_user_pages_locked(struct task_struct *tsk,
-							struct mm_struct *mm,
-							unsigned long start,
-							unsigned long nr_pages,
-							struct page **pages,
-							struct vm_area_struct **vmas,
-							int *locked,
-							unsigned int flags)
+  struct mm_struct *mm,
+  unsigned long start,
+  unsigned long nr_pages,
+  struct page **pages,
+  struct vm_area_struct **vmas,
+  int *locked,
+  unsigned int flags)
 	{
 		long ret, pages_done;
 		bool lock_dropped;
 
 		if (locked) {
-			/* if VM_FAULT_RETRY can be returned, vmas become invalid */
-			BUG_ON(vmas);
-			/* check caller initialized locked */
-			BUG_ON(*locked != 1);
+  /* if VM_FAULT_RETRY can be returned, vmas become invalid */
+  BUG_ON(vmas);
+  /* check caller initialized locked */
+  BUG_ON(*locked != 1);
 		}
 
 		if (pages)
-			flags |= FOLL_GET;
+  flags |= FOLL_GET;
 
 		pages_done = 0;
 		lock_dropped = false;
 		for (;;) {
-			ret = __get_user_pages(tsk, mm, start, nr_pages, flags, pages,
-					       vmas, locked);
-			if (!locked)
-				/* VM_FAULT_RETRY couldn't trigger, bypass */
-				return ret;
+  ret = __get_user_pages(tsk, mm, start, nr_pages, flags, pages,
+  vmas, locked);
+  if (!locked)
+  /* VM_FAULT_RETRY couldn't trigger, bypass */
+  return ret;
 
-			/* VM_FAULT_RETRY cannot return errors */
-			if (!*locked) {
-				BUG_ON(ret < 0);
-				BUG_ON(ret >= nr_pages);
-			}
+  /* VM_FAULT_RETRY cannot return errors */
+  if (!*locked) {
+  BUG_ON(ret < 0);
+  BUG_ON(ret >= nr_pages);
+  }
 
-			if (!pages)
-				/* If it's a prefault don't insist harder */
-				return ret;
+  if (!pages)
+  /* If it's a prefault don't insist harder */
+  return ret;
 
-			if (ret > 0) {
-				nr_pages -= ret;
-				pages_done += ret;
-				if (!nr_pages)
-					break;
-			}
-			if (*locked) {
-				/*
-				 * VM_FAULT_RETRY didn't trigger or it was a
-				 * FOLL_NOWAIT.
-				 */
-				if (!pages_done)
-					pages_done = ret;
-				break;
-			}
-			/* VM_FAULT_RETRY triggered, so seek to the faulting offset */
-			pages += ret;
-			start += ret << PAGE_SHIFT;
+  if (ret > 0) {
+  nr_pages -= ret;
+  pages_done += ret;
+  if (!nr_pages)
+  break;
+  }
+  if (*locked) {
+  /*
+  * VM_FAULT_RETRY didn't trigger or it was a
+  * FOLL_NOWAIT.
+  */
+  if (!pages_done)
+  pages_done = ret;
+  break;
+  }
+  /* VM_FAULT_RETRY triggered, so seek to the faulting offset */
+  pages += ret;
+  start += ret << PAGE_SHIFT;
 
-			/*
-			 * Repeat on the address that fired VM_FAULT_RETRY
-			 * without FAULT_FLAG_ALLOW_RETRY but with
-			 * FAULT_FLAG_TRIED.
-			 */
-			*locked = 1;
-			lock_dropped = true;
-			down_read(&mm->mmap_sem);
-			ret = __get_user_pages(tsk, mm, start, 1, flags | FOLL_TRIED,
-					       pages, NULL, NULL);
-			if (ret != 1) {
-				BUG_ON(ret > 1);
-				if (!pages_done)
-					pages_done = ret;
-				break;
-			}
-			nr_pages--;
-			pages_done++;
-			if (!nr_pages)
-				break;
-			pages++;
-			start += PAGE_SIZE;
+  /*
+  * Repeat on the address that fired VM_FAULT_RETRY
+  * without FAULT_FLAG_ALLOW_RETRY but with
+  * FAULT_FLAG_TRIED.
+  */
+  *locked = 1;
+  lock_dropped = true;
+  down_read(&mm->mmap_sem);
+  ret = __get_user_pages(tsk, mm, start, 1, flags | FOLL_TRIED,
+  pages, NULL, NULL);
+  if (ret != 1) {
+  BUG_ON(ret > 1);
+  if (!pages_done)
+  pages_done = ret;
+  break;
+  }
+  nr_pages--;
+  pages_done++;
+  if (!nr_pages)
+  break;
+  pages++;
+  start += PAGE_SIZE;
 		}
 		if (lock_dropped && *locked) {
-			/*
-			 * We must let the caller know we temporarily dropped the lock
-			 * and so the critical section protected by it was lost.
-			 */
-			up_read(&mm->mmap_sem);
-			*locked = 0;
+  /*
+  * We must let the caller know we temporarily dropped the lock
+  * and so the critical section protected by it was lost.
+  */
+  up_read(&mm->mmap_sem);
+  *locked = 0;
 		}
 		return pages_done;
 	}
@@ -152,8 +147,7 @@ TPU则不同，比如它里面有100个卷积计算器，它的整个目的就�
 
 抽象，通常就是这么个东西，所有东西都是可变的，我们要抓住主要矛盾和矛盾的主要方
 面，所以抽象的中心是需求，而不是现在的硬件做成什么样。
-
-
+  
 补充1：我们再拉高一层来想这个问题：如果我们把编译器定义在CPU和TPU之上，能否获得
 更多的优势？也就是说，你让我编译，我知道我的程序有可能选择运行在CPU上，也可能运
 行在TPU上，让编译器根据代码的实际情况来调配两边的资源，这样能否提升执行效率？
@@ -163,8 +157,7 @@ TPU则不同，比如它里面有100个卷积计算器，它的整个目的就�
 
 我想不出这种场景，除非你说你的TPU有部分计算根本就没法做，需要用CPU来模拟。我简
 单判断：拉高这一层的价值不大。
-
-
+  
 补充2：简单推演一下我们的整个计算要求可以怎么下（我对这个还没有深入的分析，完全
 靠YY来想一种场景，请读者指正。后面也会根据案例分析的深入对此进行修正）：
 
@@ -179,40 +172,37 @@ TPU则不同，比如它里面有100个卷积计算器，它的整个目的就�
 
 我们也不放偏置。TPU的计算缓冲假定是统一的，可以支持300个计算值，包含10个卷积计算单元，每次计算的向量长度是32。那我们排指令估计得这样排：
 
-    | Load A的32个值到计算缓冲（寄存器也行，反正总得取进来才能处理）
-    | Load B.weight的32个值到计算缓冲
-    | 发起卷积计算（但不等待）
-    | Load A的下32个值到计算缓冲
-    | Load B.weight的下32个值到计算缓冲中
-    | 发起卷积计算（但不等待）
-    | 如此类推，直到用完卷积计算单元，流水线或者缓冲……
-    | 同步等待计算完成
-    | 调度Sigmoid计算单元做下一步向量计算（但不等待）
-    | Load A的下32个值到计算缓冲中……（如此类推）
-    | 等待计算完成，回写计算缓冲到内存，让出的计算缓冲用于下一步计算……
+  | Load A的32个值到计算缓冲（寄存器也行，反正总得取进来才能处理）
+  | Load B.weight的32个值到计算缓冲
+  | 发起卷积计算（但不等待）
+  | Load A的下32个值到计算缓冲
+  | Load B.weight的下32个值到计算缓冲中
+  | 发起卷积计算（但不等待）
+  | 如此类推，直到用完卷积计算单元，流水线或者缓冲……
+  | 同步等待计算完成
+  | 调度Sigmoid计算单元做下一步向量计算（但不等待）
+  | Load A的下32个值到计算缓冲中……（如此类推）
+  | 等待计算完成，回写计算缓冲到内存，让出的计算缓冲用于下一步计算……
 
 这样，我们可能会这样来定义TPU编译器应该提供的语法：::
 
-        define_external(A, int14, [100], program.v1);  #假设是CPU负责准备数据，进入TPU程序后，根据特定的语法获得对应数据的指针
-        define_external(B, int14, [100, 10], program.v2)
-        define_external(C, int14, [10, 4], program.v3)
-        define_internal(tmp1, int14, [100], program.v4)
-        define_external(D, int14, [4], program.v5)
+  define_external(A, int14, [100], program.v1);  #假设是CPU负责准备数据，进入TPU程序后，根据特定的语法获得对应数据的指针
+  define_external(B, int14, [100, 10], program.v2)
+  define_external(C, int14, [10, 4], program.v3)
+  define_internal(tmp1, int14, [100], program.v4)
+  define_external(D, int14, [4], program.v5)
 
-        for i in [0, 9]:
-          tmp[i] = matmul(A, B[i])
-          tmp[i] = sigmoid(tmp[i])
-        for i in [0, 3]:
-          D[i] = matmul(tmp, C[i])
+  for i in [0, 9]:
+  tmp[i] = matmul(A, B[i])
+  tmp[i] = sigmoid(tmp[i])
+  for i in [0, 3]:
+  D[i] = matmul(tmp, C[i])
 
-        return;
+  return;
 
 这样，我们就有一组内存对象，计算的时候根据硬件能力调度到内部buffer中，只要内部内存还够，我们就不同步出去，这样编译器才会有足够的余量来对流水线进行优化。
-
-
-
-版本控制
-========
+  
+## 版本控制
 
 V1：完成了初稿，把骨干架起来了，其他细节待补。
 

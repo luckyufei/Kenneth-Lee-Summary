@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Linux设备异常复位逻辑分析
-*************************
 
 本文分析Linux设备复位的逻辑空间，包括对实体设备（PF）和虚拟设备（VF）的相关逻辑
 。整个分析基于Linux Kernel 5.1。

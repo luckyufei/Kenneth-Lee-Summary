@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 qemu PCIe总线结构
-******************
 
 本文是写这个章节的一些边角料：
 
@@ -34,63 +29,63 @@ PCI结构。默认是这样的：
 不同的dev类型会有不同参数，这个可以看对应设备的详细说明，部分qemu的文档中有，但
 文档不一定同步，你可以通过这样的命令让qemu直接打印出来：::
 
-        -device help
+  -device help
 
 不同的设备有不同的属性，这个在源代码中是通过object_property_add()或者在设备
 class里加的，你可以从qemu源代码的hw目录中找，每种设备类型都有类似的定义的，比如
 vfio-pic的定义是这样的：::
 
-        static Property vfio_pci_dev_properties[] = {
-            DEFINE_PROP_PCI_HOST_DEVADDR("host", VFIOPCIDevice, host),
-            DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
-            DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
-                                    display, ON_OFF_AUTO_OFF),
-            DEFINE_PROP_UINT32("xres", VFIOPCIDevice, display_xres, 0),
-            DEFINE_PROP_UINT32("yres", VFIOPCIDevice, display_yres, 0),
-            DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
-                               intx.mmap_timeout, 1100),
-            DEFINE_PROP_BIT("x-vga", VFIOPCIDevice, features,
-                            VFIO_FEATURE_ENABLE_VGA_BIT, false),
-            DEFINE_PROP_BIT("x-req", VFIOPCIDevice, features,
-                            VFIO_FEATURE_ENABLE_REQ_BIT, true),
-            DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
-                            VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
-            DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
-            DEFINE_PROP_BOOL("x-balloon-allowed", VFIOPCIDevice,
-                             vbasedev.balloon_allowed, false),
-            DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
-            DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
-            DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
-            DEFINE_PROP_BOOL("x-no-geforce-quirks", VFIOPCIDevice,
-                             no_geforce_quirks, false),
-            DEFINE_PROP_BOOL("x-no-kvm-ioeventfd", VFIOPCIDevice, no_kvm_ioeventfd,
-                             false),
-            DEFINE_PROP_BOOL("x-no-vfio-ioeventfd", VFIOPCIDevice, no_vfio_ioeventfd,
-                             false),
-            DEFINE_PROP_UINT32("x-pci-vendor-id", VFIOPCIDevice, vendor_id, PCI_ANY_ID),
-            DEFINE_PROP_UINT32("x-pci-device-id", VFIOPCIDevice, device_id, PCI_ANY_ID),
-            DEFINE_PROP_UINT32("x-pci-sub-vendor-id", VFIOPCIDevice,
-                               sub_vendor_id, PCI_ANY_ID),
-            DEFINE_PROP_UINT32("x-pci-sub-device-id", VFIOPCIDevice,
-                               sub_device_id, PCI_ANY_ID),
-            DEFINE_PROP_UINT32("x-igd-gms", VFIOPCIDevice, igd_gms, 0),
-            DEFINE_PROP_UNSIGNED_NODEFAULT("x-nv-gpudirect-clique", VFIOPCIDevice,
-                                           nv_gpudirect_clique,
-                                           qdev_prop_nv_gpudirect_clique, uint8_t),
-            DEFINE_PROP_OFF_AUTO_PCIBAR("x-msix-relocation", VFIOPCIDevice, msix_relo,
-                                        OFF_AUTOPCIBAR_OFF),
-            /*
-             * TODO - support passed fds... is this necessary?
-             * DEFINE_PROP_STRING("vfiofd", VFIOPCIDevice, vfiofd_name),
-             * DEFINE_PROP_STRING("vfiogroupfd, VFIOPCIDevice, vfiogroupfd_name),
-             */
-            DEFINE_PROP_END_OF_LIST(),
-        };
+  static Property vfio_pci_dev_properties[] = {
+  DEFINE_PROP_PCI_HOST_DEVADDR("host", VFIOPCIDevice, host),
+  DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
+  DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
+  display, ON_OFF_AUTO_OFF),
+  DEFINE_PROP_UINT32("xres", VFIOPCIDevice, display_xres, 0),
+  DEFINE_PROP_UINT32("yres", VFIOPCIDevice, display_yres, 0),
+  DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
+  intx.mmap_timeout, 1100),
+  DEFINE_PROP_BIT("x-vga", VFIOPCIDevice, features,
+  VFIO_FEATURE_ENABLE_VGA_BIT, false),
+  DEFINE_PROP_BIT("x-req", VFIOPCIDevice, features,
+  VFIO_FEATURE_ENABLE_REQ_BIT, true),
+  DEFINE_PROP_BIT("x-igd-opregion", VFIOPCIDevice, features,
+  VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT, false),
+  DEFINE_PROP_BOOL("x-no-mmap", VFIOPCIDevice, vbasedev.no_mmap, false),
+  DEFINE_PROP_BOOL("x-balloon-allowed", VFIOPCIDevice,
+  vbasedev.balloon_allowed, false),
+  DEFINE_PROP_BOOL("x-no-kvm-intx", VFIOPCIDevice, no_kvm_intx, false),
+  DEFINE_PROP_BOOL("x-no-kvm-msi", VFIOPCIDevice, no_kvm_msi, false),
+  DEFINE_PROP_BOOL("x-no-kvm-msix", VFIOPCIDevice, no_kvm_msix, false),
+  DEFINE_PROP_BOOL("x-no-geforce-quirks", VFIOPCIDevice,
+  no_geforce_quirks, false),
+  DEFINE_PROP_BOOL("x-no-kvm-ioeventfd", VFIOPCIDevice, no_kvm_ioeventfd,
+  false),
+  DEFINE_PROP_BOOL("x-no-vfio-ioeventfd", VFIOPCIDevice, no_vfio_ioeventfd,
+  false),
+  DEFINE_PROP_UINT32("x-pci-vendor-id", VFIOPCIDevice, vendor_id, PCI_ANY_ID),
+  DEFINE_PROP_UINT32("x-pci-device-id", VFIOPCIDevice, device_id, PCI_ANY_ID),
+  DEFINE_PROP_UINT32("x-pci-sub-vendor-id", VFIOPCIDevice,
+  sub_vendor_id, PCI_ANY_ID),
+  DEFINE_PROP_UINT32("x-pci-sub-device-id", VFIOPCIDevice,
+  sub_device_id, PCI_ANY_ID),
+  DEFINE_PROP_UINT32("x-igd-gms", VFIOPCIDevice, igd_gms, 0),
+  DEFINE_PROP_UNSIGNED_NODEFAULT("x-nv-gpudirect-clique", VFIOPCIDevice,
+  nv_gpudirect_clique,
+  qdev_prop_nv_gpudirect_clique, uint8_t),
+  DEFINE_PROP_OFF_AUTO_PCIBAR("x-msix-relocation", VFIOPCIDevice, msix_relo,
+  OFF_AUTOPCIBAR_OFF),
+  /*
+  * TODO - support passed fds... is this necessary?
+  * DEFINE_PROP_STRING("vfiofd", VFIOPCIDevice, vfiofd_name),
+  * DEFINE_PROP_STRING("vfiogroupfd, VFIOPCIDevice, vfiogroupfd_name),
+  */
+  DEFINE_PROP_END_OF_LIST(),
+  };
 
 但这个还是很烦，因为部分参数是从父类继承过来的。更好的办法和前面用help参数一样
 ，可以这样让它打印：::
 
-        -device vfio-pic,?
+  -device vfio-pic,?
 
 缺点是通常没有解释，如果你需要知道详细的意思，还是需要看代码。
 
@@ -110,38 +105,38 @@ vfio-pic的定义是这样的：::
 
 下面插入两张virtio的网卡到pcie.0中：::
 
-        ~/work/qemu-run-arm64/qemu/aarch64-softmmu/qemu-system-aarch64 \
-                -s -cpu cortex-a57 -machine virt \
-                -nographic -smp 2 -m 1024m -kernel arch/arm64/boot/Image \
-                -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
-                -netdev type=user,id=net1 \
-                -device virtio-net-pci,bus=pcie.0,netdev=net0,addr=6.0 \
-                -device virtio-net-pci,bus=pcie.0,netdev=net1,addr=7.0 \
-                -append "console=ttyAMA0"
+  ~/work/qemu-run-arm64/qemu/aarch64-softmmu/qemu-system-aarch64 \
+  -s -cpu cortex-a57 -machine virt \
+  -nographic -smp 2 -m 1024m -kernel arch/arm64/boot/Image \
+  -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
+  -netdev type=user,id=net1 \
+  -device virtio-net-pci,bus=pcie.0,netdev=net0,addr=6.0 \
+  -device virtio-net-pci,bus=pcie.0,netdev=net1,addr=7.0 \
+  -append "console=ttyAMA0"
 
 -netdev创建了两个本地设备，-device用这两个本地设备制造了两张网卡，我们给定了
 addr，整个拓扑就是这样的：
 
-        .. figure:: _static/pcie_topo1.jpg
+  .. figure:: _static/pcie_topo1.jpg
 
 我们再增加两条根桥和一个virtio网卡：::
 
-        ~/work/qemu-run-arm64/qemu/aarch64-softmmu/qemu-system-aarch64 \
-                -s -cpu cortex-a57 -machine virt \
-                -nographic -smp 2 -m 1024m -kernel arch/arm64/boot/Image \
-                -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
-                -netdev type=user,id=net1 \
-                -netdev type=user,id=net2 \
-                -device pcie-root-port,id=pcie.1,bus=pcie.0,port=1,chassis=1,slot=0 \
-                -device pcie-root-port,id=pcie.2,bus=pcie.0,port=2,chassis=2,slot=0 \
-                -device virtio-net-pci,bus=pcie.0,netdev=net0,addr=5.0 \
-                -device virtio-net-pci,bus=pcie.1,netdev=net1,addr=0.0 \
-                -device virtio-net-pci,bus=pcie.2,netdev=net2,addr=0.0 \
-                -append "console=ttyAMA0"
+  ~/work/qemu-run-arm64/qemu/aarch64-softmmu/qemu-system-aarch64 \
+  -s -cpu cortex-a57 -machine virt \
+  -nographic -smp 2 -m 1024m -kernel arch/arm64/boot/Image \
+  -netdev type=user,id=net0,hostfwd=tcp::5555-:22 \
+  -netdev type=user,id=net1 \
+  -netdev type=user,id=net2 \
+  -device pcie-root-port,id=pcie.1,bus=pcie.0,port=1,chassis=1,slot=0 \
+  -device pcie-root-port,id=pcie.2,bus=pcie.0,port=2,chassis=2,slot=0 \
+  -device virtio-net-pci,bus=pcie.0,netdev=net0,addr=5.0 \
+  -device virtio-net-pci,bus=pcie.1,netdev=net1,addr=0.0 \
+  -device virtio-net-pci,bus=pcie.2,netdev=net2,addr=0.0 \
+  -append "console=ttyAMA0"
 
 整个系统变成这样：
 
-        .. figure:: _static/pcie_topo2.jpg
+  .. figure:: _static/pcie_topo2.jpg
 
 这里这个chassis不能省略，qemu里现在没有自动分配这个id，你不给它就直接互相冲突，
 保证你至少给定chassis或者slot就可以规避（保证这个组合对每个设备都是唯一的）。我

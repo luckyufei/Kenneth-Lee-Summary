@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2017-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Multiprocess Support for Linux IOMMU driver
-*******************************************
 
 Most of IOMMU, or so called DMAR, is implemented supporting multiple processes.
 For example, the ASID or PCI PASID in ARM SMMU architecture is used as the
@@ -18,19 +13,19 @@ is represented as iommu_domain.
 
 The iommu_group can get only one domain attached according to its definition: ::
 
-        struct iommu_group {
-                struct kobject kobj;
-                struct kobject *devices_kobj;
-                struct list_head devices;
-                struct mutex mutex;
-                struct blocking_notifier_head notifier;
-                void *iommu_data;
-                void (*iommu_data_release)(void *iommu_data);
-                char *name;
-                int id;
-                struct iommu_domain *default_domain;
-                struct iommu_domain *domain;
-        };
+  struct iommu_group {
+  struct kobject kobj;
+  struct kobject *devices_kobj;
+  struct list_head devices;
+  struct mutex mutex;
+  struct blocking_notifier_head notifier;
+  void *iommu_data;
+  void (*iommu_data_release)(void *iommu_data);
+  char *name;
+  int id;
+  struct iommu_domain *default_domain;
+  struct iommu_domain *domain;
+  };
 
 The member, domain, is referred as the iommu_domain attached to it. If another
 domain is attached, for example, an application create a new domain via the
@@ -40,14 +35,12 @@ The Linux kernel assumes the iommu_group is assigned to a VM as a whole.
 The iommu_group->default_domain is used for kernel DMA when no other domain is
 attached. It is not another domain that can be applied with the
 iommu_group->domain at the same time.
-
-
+  
 Most of the iommu driver also takes this as a design assumption. The
 arm-smmu-v3.c attaches a new asid to the domain when the domain is attached to
 the device (in arm_smmu_attach_dev()). But it detaches the previous one if it
 exists. Same strategy is adopted by the other drivers, such as intel-iommu.c.
-
-
+  
 It looks reasonable. A VM will never share its VF with another VM. But it is
 not reasonable for the vfio-mdev device (mdev in short for this blog). Mdev is
 a virtual device created by a physical device (called parent device, or pdev in

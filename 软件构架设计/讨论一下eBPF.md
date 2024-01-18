@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2018-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 讨论一下eBPF
-************
 
 本文是思考一个方案具体是否引入eBPF的前置思考，用这个短文建一下高层逻辑。
 
@@ -73,18 +68,18 @@ eBFP现在还支持Offload（暂时应该只有Netronome支持？），在做JIT
 比如你要直接把网卡的部分消息全部路由到用户态某个Socket（AF_XDP）上，可以写一个
 这样的程序：::
 
-    // MyXdpFilter.c
-    dp_port_filter_prog(struct xdp_md *ctx) {
-      u64 tcp_dp_match = tcp_port_map_lookup(dport);
-        if(tcp_dp_match & TCP_PUBLIC)
-            return XDP_PASS;
-        return XDP_DROP;
-    }
+  // MyXdpFilter.c
+  dp_port_filter_prog(struct xdp_md *ctx) {
+  u64 tcp_dp_match = tcp_port_map_lookup(dport);
+  if(tcp_dp_match & TCP_PUBLIC)
+  return XDP_PASS;
+  return XDP_DROP;
+  }
 
 编译和使用：::
 
-        clang -O2 -target bpf -o MyXdpFilter.o -c MyXdpFilter.c
-        ip link set dev my_net xdp object MyXdpFilter.o
+  clang -O2 -target bpf -o MyXdpFilter.o -c MyXdpFilter.c
+  ip link set dev my_net xdp object MyXdpFilter.o
 
 这就是个给更高自由度的.ko，只是不像.ko那样可以放那么多资源，可以轻易把内核弄死
 。这个程序也可以造成网络不正常，但因为功能有限，犯错的机会还是小得多。

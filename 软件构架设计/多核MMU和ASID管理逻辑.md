@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 多核MMU和ASID管理逻辑
-**********************
 
 本文是回答一位同事问到的，关于有多个核运行一个或者多个进程的时候，MMU和ASID怎么
 应用的问题。
@@ -13,7 +8,7 @@
 
 MMU是CPU的地址翻译器，每个CPU一个，示意如下：
 
-        .. figure:: _static/多核MMU的ASID管理.jpg
+  .. figure:: _static/多核MMU的ASID管理.jpg
 
 你从全系统看，pa只有一份，而每个cpu都有自己的一份va，翻译方法由页表指定，放在物
 理内存里面，TLB充当这个页表内存的Cache，把常用的翻译项内置在MMU中。这是硬件角度
@@ -22,14 +17,14 @@ MMU是CPU的地址翻译器，每个CPU一个，示意如下：
 好，现在看软件怎么用。假设我创建一个进程，我把它部署到左边的CPU上。我要设定这个
 进程的页表空间，它就是这样的：
 
-        .. figure:: _static/多核MMU的ASID管理2.jpg
+  .. figure:: _static/多核MMU的ASID管理2.jpg
 
 如果你在另一个CPU上再创建一个进程，就是把左边的事情再做一次，这个我们就不画图了
 。
 
 如果你现在要把左边这个CPU的进程切换出去，交给另一个进程，就会这样：
 
-        .. figure:: _static/多核MMU的ASID管理3.jpg
+  .. figure:: _static/多核MMU的ASID管理3.jpg
 
 进程1暂时放一边，页表换成进程2的页表就行。但这个过程成本很高，因为你首先得把TLB
 里面属于进程1页表的缓冲清掉，才能保证不会影响进程2的地址空间。
@@ -54,18 +49,18 @@ MMU是CPU的地址翻译器，每个CPU一个，示意如下：
 对那个设备有效，不是全局的。所以，对于每个进程的asid，都是per_cpu结构，每个CPU
 都有一个实例。
 
-        | 有趣的而是，RISC-V的20190608-Priv-MSU-Ratified版本里面
-        | 有这样一条修改记录：
-        | Software is strongly recommended to allocate ASIDs globally,
-        | so that a future extension can globalize ASIDs for imporved
-        | performance and hardware flexibility。
-        | 做这个统一对软件来说未来表面上肯定是利好的，
-        | 因为很多方案多了一个假设可以用。但综合性能是否能够做上去，
-        | 还真要用上一段时间才知道。
+  | 有趣的而是，RISC-V的20190608-Priv-MSU-Ratified版本里面
+  | 有这样一条修改记录：
+  | Software is strongly recommended to allocate ASIDs globally,
+  | so that a future extension can globalize ASIDs for imporved
+  | performance and hardware flexibility。
+  | 做这个统一对软件来说未来表面上肯定是利好的，
+  | 因为很多方案多了一个假设可以用。但综合性能是否能够做上去，
+  | 还真要用上一段时间才知道。
 
 这时，如果其中一个CPU进行调度，把时间让给另一个进程，结果就会是这样的：
 
-        .. figure:: _static/多核MMU的ASID管理5.jpg
+  .. figure:: _static/多核MMU的ASID管理5.jpg
 
 TLB里面谁的页表都可以有，反正有asid区分，有一个线程被挂起，以后属于哪个CPU等调
 度的时候另说，剩下就是谁占着那个CPU，谁在那个CPU上的asid生效，自然就会查那个

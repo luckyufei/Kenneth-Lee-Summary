@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 一个逻辑空间控制的例子：uacce生命周期管理
-*****************************************
 
 等不了SVA的进展，最近我们的兄弟开始上传WarpDrive的内核实现(uacce)了。内核
 Maintainer Greg K. H.对其中一个地方提了如下意见：Greg Kroah-Hartman: Re: [PATCH

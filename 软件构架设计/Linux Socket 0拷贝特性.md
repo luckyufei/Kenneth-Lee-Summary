@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2017-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Linux Socket 0拷贝特性
-**********************
 
 Linux Net-next分支这个月刚刚接纳了来自Google的SOCK_ZEROCOPY特性：
 http://www.mail-archive.com/netdev@vger.kernel.org/msg180839.html。我对所有拿用
@@ -14,8 +9,8 @@ http://www.mail-archive.com/netdev@vger.kernel.org/msg180839.html。我对所有
 
 首先从接口上来看，这个特性需要修改Socket的使用方式，大概模式是这样的：::
 
-        setsockopt(socket, SOCK_ZEROCOPY);//从代码上看，现在仅支持IPv4/v6的TCP
-        send(socket, buffer, length, MSG_ZEROCOPY);
+  setsockopt(socket, SOCK_ZEROCOPY);//从代码上看，现在仅支持IPv4/v6的TCP
+  send(socket, buffer, length, MSG_ZEROCOPY);
 
 原理很简单：给socket设一个option flags，发送的时候也要指定相应的flags（理论上其
 实没有必要，因为可以从socket上拿到的，本文讨论中有人认为这是为了可以给小包选择
@@ -24,11 +19,10 @@ http://www.mail-archive.com/netdev@vger.kernel.org/msg180839.html。我对所有
 这个修改不算太大，真正不同的是，调用完send后，你不能直接释放buffer，因为这个
 buffer不一定被读走了，所以必须读一下Socket的错误队列，确定包已经发走了：::
 
-        recvmsg(socket, &message, MSG_ERRORQUEUE);
+  recvmsg(socket, &message, MSG_ERRORQUEUE);
 
 就这样，只有发端可以用。这样实现后，buffer的内容不需要拷贝到内核内存中。
-
-
+  
 把整个PatchSet看了一次后（作者还写了一个可能用于演讲的，语焉不详的材料在这里：
 https://www.netdevconf.org/2.1/slides/apr6/msgzerocopy-willemdebruijn-20170405.pdf
 ）。我发现这个特性并不是重新发明的技术，而是依赖早在2011年就已经由Redhat上传的
@@ -47,8 +41,7 @@ tun_sendmsg()->tun_get_user()->zerocopy_sg_from_iter()->zerocopy_sg_from_iter()-
 。
 
 所以，弄到最后，还是gup。
-
-
+  
 也就是说，这个方案还是会有VMA_PIN陷阱的，如果gup后没有立即做DMA，进程是有一定几
 率发生VMA的重新映射，导致用户进程无法获得DMA的返回的。但应用在发送这个功能上，
 却没有什么风险，因为进程并不使用这个内存作为返回值，发完只要能回收就够了，但这

@@ -1,20 +1,15 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 PMA和PA方案对比
-***************
 本文对比一下RISC-V的Physical Memory Attribute方案，和ARM的Page Attribute方案在
 不同场合下的优劣。
 
 我们用鲲鹏920的总线结构作为我们讨论这个问题的基础：
 
-        source/认识鲲鹏920：一个服务器SoC/总线.rst · Kenneth-Lee-2012/从鲲鹏920了解现代服务器实现和应用_公开 - 码云 Gitee.com，
+  source/认识鲲鹏920：一个服务器SoC/总线.rst · Kenneth-Lee-2012/从鲲鹏920了解现代服务器实现和应用_公开 - 码云 Gitee.com，
 
 （其中内存部分的行为可以进一步看这里：
 
-        source/计算子系统/内存访问模型.rst · Kenneth-Lee-2012/从鲲鹏920了解现代服务器实现和应用_公开 - 码云 Gitee.com
+  source/计算子系统/内存访问模型.rst · Kenneth-Lee-2012/从鲲鹏920了解现代服务器实现和应用_公开 - 码云 Gitee.com
 
 ）。
 
@@ -29,7 +24,7 @@ RISC-V的PMA和ARM的Page Attribute背后体现了一个不同的取向：RISC-V
 要我用Cache，我就用Cache，你让我不要用，我就不用，这是我的行为，不是你对端内存
 的行为。参考一下前面引用材料中这幅图：
 
-        .. figure:: _static/Cache同步.jpg
+  .. figure:: _static/Cache同步.jpg
 
 任何一个CPU看到的语义的实现，背后都是这些节点之间的复杂通讯。
 

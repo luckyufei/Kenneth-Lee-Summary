@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Accelerator vs. Co-processor
-*****************************
 
 This blog explains the intention of WarpDrive / uacce ([PATCH 0/2] A General
 Accelerator Framework, WarpDrive).

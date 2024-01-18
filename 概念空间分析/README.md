@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
-概念空间分析
-==============
+    
+## 概念空间分析
 
 概念空间是架构设计的概念。当我们分析一个系统的组成时，它包含了太多的细节，如果
 我们关注这种细节，我们就失去了对这个系统整体的判断。所以我们用一个个“总结”，来
@@ -20,8 +15,8 @@
 下面，以便查找和引用。
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-   :glob:
+  :maxdepth: 2
+  :caption: Contents:
+  :glob:
 
-   *
+  *

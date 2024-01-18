@@ -1,12 +1,5 @@
-.. Kenneth Lee 版权所有 2021
-
-:Authors: Kenneth Lee
-:Version: 1.0
-:Date: 2021-08-28
-:Status: Draft
-
+        
 iommu设备和uacce关系分析
-*********************************
 
 最近在社区看到一个新的提案：\ https://lwn.net/Articles/862320/\ 。提出了一种新
 的从用户态使用iommu设备的方式，称为/dev/iommu。这个方案的目标和uacce很接近，我

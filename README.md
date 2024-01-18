@@ -42,9 +42,9 @@ make epub
 1. 可以下载文件后自己编译
 
 2. 直接下载我定时编译的Released版本：
-   [Release](https://gitee.com/Kenneth-Lee-2012/MySummary/releases)
+  [Release](https://gitee.com/Kenneth-Lee-2012/MySummary/releases)
 
 3. 在github上阅读
 
 4. 在readthedocs上的版本：
-   [MySummary](https://mysummary.readthedocs.io/zh/latest/index.html)
+  [MySummary](https://mysummary.readthedocs.io/zh/latest/index.html)

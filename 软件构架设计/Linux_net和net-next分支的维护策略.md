@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2019-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Linux net和net-next分支的维护策略
-**********************************
 
 有同学愿意“准确”地描述“事实”，不想“不精确”你进行抽象。这在工作展开阶段只会阻碍
 事情推进。我来代劳一下吧。
@@ -14,18 +9,18 @@ Linux net和net-next分支的维护策略
 
 Linux主线是这个：
 
-    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 
 我们假设读者都知道这个Open Windows, rc1-n, release的维护过程。
 
 为了传到这个主线，网络子系统的维护者David Miller自己又维护了两个分支。根据
 
-        https://www.kernel.org/doc/Documentation/networking/netdev-FAQ.txt
+  https://www.kernel.org/doc/Documentation/networking/netdev-FAQ.txt
 
 David Miller的分支是：
 
-        https://git.kernel.org/pub/scm/linux/kernel/git/davem/net.git
-        https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+  https://git.kernel.org/pub/scm/linux/kernel/git/davem/net.git
+  https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
 
 下级维护者不能直接上传Linux主线，必须通过这两个分支代理。
 

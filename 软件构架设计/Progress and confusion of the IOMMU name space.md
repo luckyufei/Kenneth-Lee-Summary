@@ -1,26 +1,18 @@
-.. Kenneth Lee 版权所有 2018-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Progress and confusion of the IOMMU name space
-**********************************************
 
-Introduction
-=============
+## Introduction
 
 We are now working on an accelerator framework based on VFIO. New concepts need
 to be added. At the same time, the other developers are adding new ideas too.
 The name space here become complex. I try to clear it though in this blog.
-
-
-The Basic Idea
-===============
+  
+## The Basic Idea
 
 IOMMU is the facility to separate the DMA space of different devices. This is
 illustrated as follow figure: 
 
-        .. figure:: _static/iommu1.png
+  .. figure:: _static/iommu1.png
 
 IOMMU works just like MMU for the CPU. Address request issued by the device
 will be translated according to the page table assigned to its IOMMU. In many
@@ -32,7 +24,7 @@ In Linux, iommu_group is used as the representative of the group of devices
 owned by the same IOMMU. It contains a iommu_domain referring to the status of
 the IOMMU currently applied:
 
-        .. figure:: _static/iommu2.png
+  .. figure:: _static/iommu2.png
 
 The iommu_group (along with its iommu_domain) is taken as the security border
 for the CPU to control the device. When the CPU enables some address mapping in
@@ -43,8 +35,7 @@ The iommu_group is created by the bus driver when the device is detected. A
 default_domain will be created with the group. So the default DMA operation
 (say, from the driver) can be taken by it. But the effective domain can be
 changed later.
-
-
+  
 This is good enough for driver-device communication with kernel. But it is not
 enough for user application who issues request to one or more than one devices.
 
@@ -57,7 +48,7 @@ address space (managed as a rb_tree).
 
 This can be illustrated as follow:
 
-        .. figure:: _static/iommu3.png
+  .. figure:: _static/iommu3.png
 
 New iommu_groups can be attached to a container, its vfio_group is created and
 added to an exist or new created vfio_domain (so as its iommu_domain, and this
@@ -65,8 +56,7 @@ new iommu_domain will replace the default_domain as effective domain in the
 iommu_group). In the case of new domain created, the dma_map_rbtree will be
 replayed on it. So all IOMMUs in this container have the same DMA
 space/mapping.
-
-
+  
 But this is not all. The VFIO framework must ensure the default_domain will not
 be used any longer. So the device must be unbound from its original driver and
 rebound to a VFIO device driver, e.g. vfio-platform or vfio-pci driver.
@@ -74,21 +64,19 @@ rebound to a VFIO device driver, e.g. vfio-platform or vfio-pci driver.
 VFIO device driver use the VFIO driver API to register itself as a VFIO-ied
 device: ::
 
-        int vfio_add_group_dev(struct device *dev,
-                const struct vfio_device_ops *ops, void *device_data);
-        struct vfio_device *vfio_device_get_from_dev(struct device *dev);
-        void *vfio_device_data(struct vfio_device *device);
-        void *vfio_del_group_dev(struct device *dev);
+  int vfio_add_group_dev(struct device *dev,
+  const struct vfio_device_ops *ops, void *device_data);
+  struct vfio_device *vfio_device_get_from_dev(struct device *dev);
+  void *vfio_device_data(struct vfio_device *device);
+  void *vfio_del_group_dev(struct device *dev);
 
 With this design, the VFIO framework become a agent of the device. DMA
 Operation of the devices can be conducted directly on the container itself.
 
 This is important. It means we cannot simply use any device without make it as
 a VFIO-ized device.
-
-
-PASID Support
-==============
+  
+## PASID Support
 
 A devices may communicate to more than one process. So most IOMMU
 implementation support the concept of PASID-ed address mapping. In this case,
@@ -106,10 +94,8 @@ PASID.
 
 To expose the feature to VFIO, Jean also add two new commands,
 VFIO_IOMMU_ATTACH and VFIO_IOMMU_BIND, for binding the process to the domain.
-
-
-Our Requirement
-================
+  
+## Our Requirement
 
 We are going to implement an accelerator framework for accelerators, e.g. GPU,
 TPU, FPGA, Smart NIC, ZIP/UNZIP engine, RSA engine, etc. We assume the data
@@ -125,10 +111,8 @@ Consider this scenario: you have a multi-queue NIC and you are going to use it
 as the last device of your data flow. We want to use some of the queues in the
 NIC for that purpose. But you still need the original driver for the basic
 feature as a netdev, say, set its mac address with ethtool.
-
-
-VFIO MDEV
-==========
+  
+## VFIO MDEV
 
 VFIO Mdev looks a solution for this. The VFIO mdev is initially introduced by
 Nvidia for its virtual GPU, which cannot be taken as a standard SR-IOV VF.
@@ -146,7 +130,7 @@ course, as a VFIO-ized device. It cannot share the facility as the other device
 do. So it uses its own iommu_domain and takes care of all DMA operations by its
 own. This change the VFIO framework a little bit: 
 
-        .. figure:: _static/iommu4.png
+  .. figure:: _static/iommu4.png
 
 external_domain list are introduced to maintain the domain which is controlled
 directly by the device driver itself. The notifier_chain is used to notify the
@@ -165,10 +149,8 @@ problem will be solved.
 But this also change to the meaning of iommu_group a bit. There will be some
 kinds of virtual iommu_group, which directly share the IOMMU hardware resource
 with other iommu_group without telling those exist iommu_group.
-
-
-WarpDrive with mdev
-====================
+  
+## WarpDrive with mdev
 
 We call our framework as WarpDrive. When a hardware device is registered as a
 WarpDrive device, it will be registered as a mdev. So the system administrator
@@ -183,17 +165,16 @@ interface.
 The WrapDrive should also ensure only the PASID allocated to the corespondent
 process is assigned to the hardware. 
 
-Conclusion
-==========
+## Conclusion
 
 So here is the conclusion:
 
 1. We should add an attribute to the mdev, making it reuse the parent's
-   iommu_group
+  iommu_group
 
 2. The accelerator driver can expose some function as mdev, so the application
-   can make use of it with VFIO interface.
+  can make use of it with VFIO interface.
 
 3. For WarpDrive, we can expose the function as mdev but the queue allocated to
-   the application can be attached to the fd of the vfio device. It will be
-   easier to release when the application exist.
+  the application can be attached to the fd of the vfio device. It will be
+  easier to release when the application exist.

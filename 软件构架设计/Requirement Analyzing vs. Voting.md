@@ -1,10 +1,5 @@
-.. Kenneth Lee 版权所有 2018-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 Requirement Analyzing vs. Voting
-********************************
 
 Days ago, I made a keynote speech in an open source event. Before I got on the
 podium, I had planned to add some new examples to my slide according to the
@@ -24,16 +19,16 @@ to do the same. But finally, we found that they never be happy with us in the
 end. There are two reason here:
 
 1. As a software platform, people won't ask you for key features. They intend
-   to ask for something that they cannot do, (in most case, neither can you,)
-   or it is not worthy for them to do. So you fulfill their list, you just make
-   their mouth shut, but never make them happy. And if they are not happy, they
-   can always find a reason that you do not really fulfill their requirement,
-   or even they don't need to find a reason, they just leave.
+  to ask for something that they cannot do, (in most case, neither can you,)
+  or it is not worthy for them to do. So you fulfill their list, you just make
+  their mouth shut, but never make them happy. And if they are not happy, they
+  can always find a reason that you do not really fulfill their requirement,
+  or even they don't need to find a reason, they just leave.
 
 2. Even you have very good technologies that they don't have, they want to get
-   it from you. But there is no effort to ask for anything. They will ask many
-   of them without consideration. Your work will lost focus, you will never
-   reach the best end.
+  it from you. But there is no effort to ask for anything. They will ask many
+  of them without consideration. Your work will lost focus, you will never
+  reach the best end.
 
 So when I develop our OS distribution for our product lines, I adopt a total
 different strategy. I spend about a year for requirement analyse. I did ask
@@ -43,10 +38,10 @@ serious. I study their structure accordingly:
 1. What is their organization structure and everyday work?
 
 2. What is their biggest effort to make? What are their key requirements from
-   their own customers?
+  their own customers?
 
 3. What is the key reason that they try to cooperation with you.  What is the
-   best relationship between you and them. 
+  best relationship between you and them. 
 
 So finally I will come up with my own requirement list. And I start to put all
 my effort to implement the list. In the period to the end, they will blame me

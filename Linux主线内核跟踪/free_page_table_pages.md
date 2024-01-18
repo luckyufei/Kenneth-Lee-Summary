@@ -1,12 +1,5 @@
-.. Kenneth Lee 版权所有 2021
-
-:Authors: Kenneth Lee
-:Version: 1.0
-:Date: 2021-11-25
-:Status: Draft
-
+        
 释放页表页补丁分析
-******************
 
 本文分析这个补丁：
 https://lore.kernel.org/lkml/20211110105428.32458-1-zhengqi.arch@bytedance.com/

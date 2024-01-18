@@ -1,13 +1,7 @@
-.. Kenneth Lee 版权所有 2016-2020
-
-:Authors: Kenneth Lee
-:Version: 1.0
-
+    
 在Linux下做性能分析
-*******************
 
-基本模型
-========
+## 基本模型
 
 介绍
 ----
@@ -17,8 +11,8 @@
 谨。主要是把这个领域的一些思路和技巧串起来。如果读者来讨论得多，我们就讨论深入
 一点，如果讨论得少，那就当作一个提纲给我做一些对外交流用吧。
 
-基本模型
----------
+### 基本模型
+
 
 我们需要有一套完整的方法来发现系统的瓶颈。“瓶颈”这个概念，来自业务目标，不考虑
 业务目标就没有“瓶颈”这个说法。从业务目标角度，通常我们的瓶颈出现在业务的通量（
@@ -31,7 +25,7 @@ Throughput）和时延（Latency）两个问题上。（手机等领域常常还
 通量和时延是相互相承的两个量，当通量达到系统上限，时延就会大幅提高。我们从下面
 这个例子开始来看这个模型：
 
-        .. figure:: _static/通讯模型1.png
+  .. figure:: _static/通讯模型1.png
 
 请求从客户端发到计算机上，花t1的时间，用t2的时间完成计算，然后用t3的时间把结果
 送回到客户端，这个时延是t1+t2+t3，如果我们在t3发过来后，发下一个请求，这样系统
@@ -42,7 +36,7 @@ Throughput）和时延（Latency）两个问题上。（手机等领域常常还
 有必要，但整体上没有必要。其原理就是CPU流水线）。所以这个模型应该这样来实现（图
 2）：
 
-        .. figure:: _static/通讯模型2.png
+  .. figure:: _static/通讯模型2.png
 
 t2变成一个队列的处理，这样时延还是会等于t1+t2+t3，但t2的含义变了。只要调度能平
 衡，而且认为通讯管道的流量无限，通量可以达到1/t2（和CPU流水线中，一个节拍可以执
@@ -60,7 +54,7 @@ t2就是可以被计算的了。
 现代CPU是一个多核多部件系统，这种队列关系在整个系统中会变得非常复杂，比如，它有
 可能是这样的（图3）：
 
-        .. figure:: _static/通讯模型3.png
+  .. figure:: _static/通讯模型3.png
 
 虽然很多系统看起来不是这样一个接一个队列的模型，但其实如果你只考虑主业务流，几
 乎大部分情形都是这样的
@@ -78,8 +72,8 @@ CPU，没有满载就找流控点，通过流控点调整时延和通量就可�
 在多核的情况下，CPU无法满载还会有一个原因，就是业务线程没有办法在多个CPU上展开
 ，这需要通过增加处理线程来实现。
 
-全系统的线程模型
-----------------
+### 全系统的线程模型
+
 
 我们一般看系统是从“模块”的角度来看的，但看系统的性能模型，我们是从线程的角度来
 看的。
@@ -115,18 +109,18 @@ socket buffer之间的大小，流控时间，部署给这些队列的线程的�
 2. 匹配不同执行流程的速率
 
 3. 当线程的执行流程中有同步IO的时候，增加线程以便减少在同步IO上的等待时间（本质
-   上是增加流水线层次提升执行部件的同步效率）
+  上是增加流水线层次提升执行部件的同步效率）
 
 后面我们谈具体的优化技巧的时候我们会重新提到线程的这些效果。
 
-一般操作方法
--------------
+### 一般操作方法
+
 
 所以，当我们遭遇一个通量性能瓶颈的时候，我们通常分三步来发现瓶颈的位置：
 
 1. CPU占用率是否已经满了，这个用top就可以看到，比如下面这个例子：
 
-        .. figure:: _static/top.png
+  .. figure:: _static/top.png
 
 有两个CPU的idle为0，另两个基本上都是接近100%的idle，我们基于这个就可以决定我们
 下一步的分析方向是什么了。
@@ -137,14 +131,14 @@ socket buffer之间的大小，流控时间，部署给这些队列的线程的�
 定是否需要提升队列长度来修复这种流控。例如，我们常常用ifconfig来观察网卡是否有
 丢包：::
 
-        wlan0     Link encap:以太网  硬件地址 7c:7a:91:xx:xx:xx  
-                  inet 地址:192.168.0.103  广播:192.168.0.255  掩码:255.255.255.0
-                  inet6 地址: fe80::7e7a:91ff:fefe:5a1a/64 Scope:Link
-                  UP BROADCAST RUNNING MULTICAST  MTU:1500  跃点数:1
-                  接收数据包:113832 错误:0 丢弃:0 过载:0 帧数:0
-                  发送数据包:81183 错误:0 丢弃:0 过载:0 载波:0
-                  碰撞:0 发送队列长度:1000 
-                  接收字节:47850861 (47.8 MB)  发送字节:18914031 (18.9 MB)
+  wlan0     Link encap:以太网  硬件地址 7c:7a:91:xx:xx:xx  
+  inet 地址:192.168.0.103  广播:192.168.0.255  掩码:255.255.255.0
+  inet6 地址: fe80::7e7a:91ff:fefe:5a1a/64 Scope:Link
+  UP BROADCAST RUNNING MULTICAST  MTU:1500  跃点数:1
+  接收数据包:113832 错误:0 丢弃:0 过载:0 帧数:0
+  发送数据包:81183 错误:0 丢弃:0 过载:0 载波:0
+  碰撞:0 发送队列长度:1000 
+  接收字节:47850861 (47.8 MB)  发送字节:18914031 (18.9 MB)
 
 在高速网卡场景中，我们常常要修改/proc/sys中的网络参数保证收包缓冲区足够处理一波
 netpolling的冲击。
@@ -160,7 +154,7 @@ netpolling的冲击。
 多个线程把空洞修掉。具体的原理，后面谈分析方法的时候再深入介绍。
 
 2. 如果CPU占用率已经占满了，观察CPU的时间是否花在业务进程上，如果不是，分析产生
-   这种问题的原因。Linux的perf工具常常可以提供良好的分析，比如这样：
+  这种问题的原因。Linux的perf工具常常可以提供良好的分析，比如这样：
 
 这里例子中的CPU占用率已经全部占满了。但时间中只有15.43%落在主业务流程上，下面有
 大量的时间花在了锁和调度上。如果我们简单修改一下队列模式，我们就可以把这个占用
@@ -174,15 +168,14 @@ netpolling的冲击。
 就是有额外的问题引起额外的代价了）
 
 3. 如果CPU的时间确实都已经在处理业务的，剩下的问题就是看CPU执行系统是否被充分利
-   用（比如基于例如Top Down模型分析系统CPU的执行部件是否被充分利用） 或者软件算
-   法是否可以优化了。这个也可以通过perf和ftrace组合功能来实现。
+  用（比如基于例如Top Down模型分析系统CPU的执行部件是否被充分利用） 或者软件算
+  法是否可以优化了。这个也可以通过perf和ftrace组合功能来实现。
 
 在后面几篇博文中，我们会逐一看看Linux的perf和ftrace功能如何对这些分析提供技术支
 持的。
+  
+### 关于流控
 
-
-关于流控
----------
 
 流控是个很复杂的问题，这里没有准备展开，但需要补充几个值得考量的问题。
 
@@ -193,8 +186,7 @@ netpolling的冲击。
 第二，在有流控的系统上，需要注意一种很常见的陷阱：就是队列过长，导致最新的包被
 排到很后才处理，等完成整个系统的处理的时候，这个包已经被请求方判断超时了。这种
 情况会导致大量的失效包。所以，流控的开始时间要首先于每个包的超时时间。
-
-
+  
 总结
 ----
 
@@ -203,8 +195,7 @@ netpolling的冲击。
 统的运行模型，并有意识地通过程序本身的统计以及系统的统计，对程序进行profiling，
 并针对性地解决问题。 
 
-ftrace
-=======
+## ftrace
 
 介绍
 ----
@@ -230,15 +221,15 @@ ftrace通过debugfs对外提供接口，所以不需要额外的工具进行支�
 mount这个文件系统，你也可以手工mount。作为虚拟文件系统，它和procfs一样，给定类
 型就可以mount，比如你可以这样：::
 
-        mount -t debugfs none /home/kenneth-lee/debug
+  mount -t debugfs none /home/kenneth-lee/debug
 
 tracing目录中的内容有点乱：::
 
-        available_events            current_tracer         function_profile_enabled  options         saved_cmdlines_size  set_ftrace_pid      stack_trace         trace_options        tracing_on
-        available_filter_functions  dyn_ftrace_total_info  instances                 per_cpu         set_event            set_graph_function  stack_trace_filter  trace_pipe           tracing_thresh
-        available_tracers           enabled_functions      kprobe_events             printk_formats  set_event_pid        set_graph_notrace   trace               trace_stat           uprobe_events
-        buffer_size_kb              events                 kprobe_profile            README          set_ftrace_filter    snapshot            trace_clock         tracing_cpumask      uprobe_profile
-        buffer_total_size_kb        free_buffer            max_graph_depth           saved_cmdlines  set_ftrace_notrace   stack_max_size      trace_marker        tracing_max_latency
+  available_events            current_tracer         function_profile_enabled  options         saved_cmdlines_size  set_ftrace_pid      stack_trace         trace_options        tracing_on
+  available_filter_functions  dyn_ftrace_total_info  instances                 per_cpu         set_event            set_graph_function  stack_trace_filter  trace_pipe           tracing_thresh
+  available_tracers           enabled_functions      kprobe_events             printk_formats  set_event_pid        set_graph_notrace   trace               trace_stat           uprobe_events
+  buffer_size_kb              events                 kprobe_profile            README          set_ftrace_filter    snapshot            trace_clock         tracing_cpumask      uprobe_profile
+  buffer_total_size_kb        free_buffer            max_graph_depth           saved_cmdlines  set_ftrace_notrace   stack_max_size      trace_marker        tracing_max_latency
 
 里面虽然有一个README文件在解释，但这个文档更新得不快，很多时候和实际的内容对不
 上。但不要紧，只要我们抓住重点逻辑，就很容易理解了。ftrace的目录设置和sysfs类似
@@ -269,7 +260,7 @@ trace等文件的输出是综合所有CPU的，如果你关心单个CPU可以进
 和所有面向对象设计一样，instance通过操作对应属性来控制其行为，比如，向trace文件
 写一个空字符串可以清空对应的缓冲区：::
 
-        echo > trace
+  echo > trace
 
 又比如，向tracing_on文件写1启动跟踪，写0停止跟踪等。向set_ftrace_pid写pid可以限
 制只根据某个pid的事件等。
@@ -286,24 +277,24 @@ ftrace有两种主要跟踪机制可以往缓冲区中写数据，一种是函�
 事件是固定插入到内核中的跟踪点，我们看Linux代码的时候，经常看到这种trace_开头的
 函数调用：::
 
-        if (likely(prev != next)) {
-                rq->nr_switches++;
-                rq->curr = next;
-                ++*switch_count;
+  if (likely(prev != next)) {
+  rq->nr_switches++;
+  rq->curr = next;
+  ++*switch_count;
 
-                trace_sched_switch(preempt, prev, next);
-                rq = context_switch(rq, prev, next, cookie); /* unlocks the rq */
-        } else {
-                lockdep_unpin_lock(&rq->lock, cookie);
-                raw_spin_unlock_irq(&rq->lock);
-        }
+  trace_sched_switch(preempt, prev, next);
+  rq = context_switch(rq, prev, next, cookie); /* unlocks the rq */
+  } else {
+  lockdep_unpin_lock(&rq->lock, cookie);
+  raw_spin_unlock_irq(&rq->lock);
+  }
 
 这个地方就是一个事件，也就是打在程序中的一个桩，如果你使能这个桩，程序执行到这
 个地方就会把这个点（就是一个整数，而不是函数名），加上后面的三个参数（preempt,
 prev, next)都写到缓冲区中。到后面你要输出的时候，它会用一个匹配的解释函数来把内
 容解释出来，然后你在trace文件中看到的就是这样的：
 
-        .. figure:: _static/ftrace1.png
+  .. figure:: _static/ftrace1.png
 
 启动事件跟踪的方法很简单：
 
@@ -312,8 +303,8 @@ prev, next)都写到缓冲区中。到后面你要输出的时候，它会用一
 2. 把那个事件的名称写进set_event，可以写多个，可以写sched:* 这样的通配符
 
 3. 通过trace_on文件启动跟踪。启动之前可以通过比如tracing_cpumask这样的文件限制
-   跟踪的CPU，通过set_event_pid设置跟踪的pid，或者通过其他属性进行更深入的设定
-   。
+  跟踪的CPU，通过set_event_pid设置跟踪的pid，或者通过其他属性进行更深入的设定
+  。
 
 剩下的事情就是执行跟踪程序和分析跟踪结果了。
 
@@ -325,28 +316,28 @@ prev, next)都写到缓冲区中。到后面你要输出的时候，它会用一
 接操作events目录下面的事件参数，比如仍是跟踪前面这个sched_switch，你可以先看看
 events/sched/sched_switch/format文件：::
 
-        name: sched_switch
-        ID: 273
-        format:
-                field:unsigned short common_type;       offset:0;       size:2; signed:0;
-                field:unsigned char common_flags;       offset:2;       size:1; signed:0;
-                field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
-                field:int common_pid;   offset:4;       size:4; signed:1;
+  name: sched_switch
+  ID: 273
+  format:
+  field:unsigned short common_type;       offset:0;       size:2; signed:0;
+  field:unsigned char common_flags;       offset:2;       size:1; signed:0;
+  field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
+  field:int common_pid;   offset:4;       size:4; signed:1;
 
-                field:char prev_comm[16];       offset:8;       size:16;        signed:1;
-                field:pid_t prev_pid;   offset:24;      size:4; signed:1;
-                field:int prev_prio;    offset:28;      size:4; signed:1;
-                field:long prev_state;  offset:32;      size:8; signed:1;
-                field:char next_comm[16];       offset:40;      size:16;        signed:1;
-                field:pid_t next_pid;   offset:56;      size:4; signed:1;
-                field:int next_prio;    offset:60;      size:4; signed:1;
+  field:char prev_comm[16];       offset:8;       size:16;        signed:1;
+  field:pid_t prev_pid;   offset:24;      size:4; signed:1;
+  field:int prev_prio;    offset:28;      size:4; signed:1;
+  field:long prev_state;  offset:32;      size:8; signed:1;
+  field:char next_comm[16];       offset:40;      size:16;        signed:1;
+  field:pid_t next_pid;   offset:56;      size:4; signed:1;
+  field:int next_prio;    offset:60;      size:4; signed:1;
 
 你就可以看到这个事件可以支持的域，你只要向同级目录中的filter中写一条类C的表达式
 就可以对这个事件进行过滤。
 
 比如，我注意到这个跟踪点支持next_comm这个域，我就可以这样写：::
 
-        echo 'next_comm ~ "cs"' > events/sched/sched_switch/filter
+  echo 'next_comm ~ "cs"' > events/sched/sched_switch/filter
 
 这样我就可以仅跟踪调度器切换到cs这个线程的场景了。
 
@@ -366,11 +357,11 @@ events/sched/sched_switch/format文件：::
 册看看有没有什么实际的用途。 其中手册中提到一个特别酷的功能叫“hist”（输出柱状图
 ），它可以通过这样的命令：::
 
-        echo 'hist:key=call_site:val=bytes_req' > /sys/kernel/debug/tracing/events/kmem/kmalloc/trigger
+  echo 'hist:key=call_site:val=bytes_req' > /sys/kernel/debug/tracing/events/kmem/kmalloc/trigger
 
 实现下面这样的效果：
 
-        .. figure:: _static/ftrace2.png
+  .. figure:: _static/ftrace2.png
 
 这相当于给你提供一个各个内存分配点的内存分配次数和数量的一个分布图。这很爽，不过老实说，有了trace文件，要产生这样的数据也是分分钟的事，所以我也不是很需要这个功能。
 
@@ -380,16 +371,16 @@ events/sched/sched_switch/format文件：::
 
 我的机器上支持如下功能：::
 
-        blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop
+  blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop
 
 比如我要跟踪系统唤醒的时延，我们可以：::
 
-        echo wakeup > current_tracer
-        echo 1 > tracing_on
+  echo wakeup > current_tracer
+  echo 1 > tracing_on
 
 wakeup跟踪的输出是这个样子的：
 
-        .. figure:: _static/ftrace3.png
+  .. figure:: _static/ftrace3.png
 
 它可以跟踪在你跟踪的期间里，最高优先级的任务的调度最大时延。比如上面这个统计统
 计到的最大时延是52us（算不错了），下面给出的跟踪点是这个任务（
@@ -407,22 +398,22 @@ irq/49-iwlwifi-1625)被唤醒后，执行了哪些动作，才轮到它执行了
 函数跟踪和事件跟踪一样，相当于在函数入口那里增加了一个trace_函数， 函数跟踪的效
 果类似这样：
 
-        .. figure:: _static/ftrace4.png
+  .. figure:: _static/ftrace4.png
 
 加堆栈跟踪的话，可以变成这样：
 
-        .. figure:: _static/ftrace5.png
+  .. figure:: _static/ftrace5.png
 
 函数跟踪也可以做类似事件工作一样的过滤功能，这个用户可以看手册，我用这个功能一
 般是用来跟踪和性能无关的执行过程，
 
-用户态跟踪
------------
+### 用户态跟踪
+
 
 ftrace一个比较明显的缺点是没有用户态的跟踪点支持，作为补救，instance中提供了一
 个文件，trace_marker，写这个文件可以在跟踪中产生一条记录。类似这样：
 
-        .. figure:: _static/ftrace6.png
+  .. figure:: _static/ftrace6.png
 
 你可以注意到，这其中 tracing_mark_write就是一个marker，我在我的程序做
 pthread_yield()的时候加了一个marker，这样我就可以跟踪当我yield出去的时候，系统
@@ -431,8 +422,8 @@ pthread_yield()的时候加了一个marker，这样我就可以跟踪当我yield
 这个跟踪方法的缺点是需要额外的系统调用，没有内核跟踪那么高效，但聊胜于无，至少
 这个方法帮助我解决过不少问题。
 
-会话跟踪
---------
+### 会话跟踪
+
 
 使用ftrace的另一个缺点是它会话跟踪能力比较差，比如你在网卡上收到一个包，这个包
 调度到了Socket的队列，然后再送到用户队列。虽然你可以在这些位置人工增加跟踪点，
@@ -443,8 +434,8 @@ pthread_yield()的时候加了一个marker，这样我就可以跟踪当我yield
 现在网络层的预置事件比较少，我们可以首先考虑是否可以通过函数来跟踪，如果不行，
 就自己加跟踪点吧。
 
-其他功能
----------
+### 其他功能
+
 
 ftrace还可以通过uprobe/kprobe设置跟踪点，我对这两个东西不是很信任，所以用得很少
 ，原理也很容易猜出来，所以，读者有兴趣可以自己去看，这里就不深入介绍了。
@@ -471,7 +462,7 @@ perf的原理是这样的：每隔一个固定的时间，就在CPU上（每个�
 在中断上看看，当前是哪个pid，哪个函数，然后给对应的pid和函数加一个统计值，这样
 ，我们就知道CPU有百分几的时间在某个pid，或者某个函数上了。这个原理图示如下：
 
-        .. figure:: _static/perf1.png
+  .. figure:: _static/perf1.png
 
 很明显可以看出，这是一种采样的模式，我们预期，运行时间越多的函数，被时钟中断击
 中的机会越大，从而推测，那个函数（或者pid等）的CPU占用率就越高。
@@ -487,11 +478,11 @@ perf的原理是这样的：每隔一个固定的时间，就在CPU上（每个�
 点，每次内核调用这个函数的时候，就上来看看，到底谁引发了这个跟踪点（这个只能用
 来按pid分类，按函数分类没有用，因为tracepoint的位置是固定的），比如这样：::
 
-        sudo perf top -e sched:sched_switch -s pid
+  sudo perf top -e sched:sched_switch -s pid
 
 输出：
 
-        .. figure:: _static/perf2.jpg
+  .. figure:: _static/perf2.jpg
 
 当然，perf使用更多是CPU的PMU计数器，PMU计数器是大部分CPU都有的功能，它们可以用
 来统计比如L1 Cache失效的次数，分支预测失败的次数等。PMU可以在这些计数器的计数超
@@ -500,11 +491,11 @@ perf的原理是这样的：每隔一个固定的时间，就在CPU上（每个�
 
 下面是一个分支预测失效的跟踪命令和动态结果：::
 
-        sudo perf top -e branch-misses
+  sudo perf top -e branch-misses
 
 输出：
 
-        .. figure:: _static/perf3.jpg
+  .. figure:: _static/perf3.jpg
 
 我们从这里就可以看到系统中哪些函数制造了最多的分支预测失败，我们可能就需要在那
 些函数中考虑一下有没有可能塞进去几个likely()/unlikely()这样的宏了。
@@ -515,8 +506,8 @@ perf的原理是这样的：每隔一个固定的时间，就在CPU上（每个�
 否正常了，比如内核调度子系统的函数占用率特别高，我们可能就知道我们需要分析一下
 调度过程了。
 
-使用perf
----------
+### 使用perf
+
 
 perf的源代码就是Linux的源代码目录中，因为它在相当程度上和内核是关联的。它会使用
 Linux内核的头文件。但你编译内核的时候并不会编译它，你必须主动进入tools/perf目录
@@ -536,10 +527,9 @@ perf命令，而通过的perf命令入其实只是个脚本，根据你当前的
 能，我在实践中经常直接找最新的内核自己重新编译版本，好像也没有出过什么问题。读
 者可以有限度参考这个经验。perf也没有很多的路径依赖，你编译完以后连安装都不用，
 直接用绝对路径调用你编译的版本即可。
+  
+### 一般跟踪
 
-
-一般跟踪
----------
 
 前面我们已经看了几个perf工作的例子了。类似git，docker等多功能工具，perf也是使用
 perf <子命令>这种模式。所有人首先需要学习的是两个最简单的命令：perf list和perf
@@ -547,7 +537,7 @@ top。
 
 perf list列出perf可以支持的所有事件。例如这样：::
 
-        .. figure:: _static/perf4.jpg
+  .. figure:: _static/perf4.jpg
 
 旧版本还会列出所有的tracepoint，但那个列表太长了，新版本已经不列这个东西了，读
 者可以直接到ftrace那边去看就好了。
@@ -562,37 +552,35 @@ perf top可以动态收集和更新统计列表，和很多其他perf命令一�
 
 一个-e也可以直接指定多个事件，中间用逗号隔开即可：::
 
-        sudo perf top -e branch-misses,cycles
+  sudo perf top -e branch-misses,cycles
 
 （perf list给出的事件是厂家上传上去给Linux社区的，但有些厂家会有自己的事件统计
 ，没有上传出去，这你需要从厂家的用户手册中获得，这种事件，可以直接用编号表示，
 比如格式是rXXXX，比如在我们的芯片里面，0x13号表示跨芯片内存访问，你就可以用-e
 r0013来跟踪软件的跨片访问次数）
-
-
+  
 事件可以指定后缀，比如我想只跟踪发生在用户态时产生的分支预测失败，我可以这样：
 ::
 
-        sudo perf top -e branch-misses:u,cycles
+  sudo perf top -e branch-misses:u,cycles
 
 全部事件都有这个要求，我还可以：::
 
-        sudo perf top -e ‘{branch-misses,cycles}:u'
+  sudo perf top -e ‘{branch-misses,cycles}:u'
 
 看看perf-list的手册，会找到更多的后缀，后缀我也用得比较少，读者对这个有兴趣，可
 以自己深入挖掘一下，如果有什么好的使用经验，希望也可以告诉我。
-
-
+  
 2. -s 指定按什么参数来进行分类
 
 -s参数可以不使用，默认会按函数进行分类，但如果你想按pid来分，就需要靠-s来进行分
 类了。前面我们已经看过这样的例子了。-s也可以指定多个域（用逗号隔开），例如这样
 ：::
 
-        sudo perf top -e 'cycles' -s comm,pid,dso
+  sudo perf top -e 'cycles' -s comm,pid,dso
 
 输出：
-        .. figure:: _static/perf5.jpg
+  .. figure:: _static/perf5.jpg
 
 perf-top用来理解，体会perf的功能是比较好的，但实践中用得不多，用得比较多的是
 perf-record和perf-report命令。perf-record用来启动一次跟踪，而perf-report用来输
@@ -600,12 +588,12 @@ perf-record和perf-report命令。perf-record用来启动一次跟踪，而perf-
 
 一般的过程是：::
 
-        sudo perf record -e 'cycles' -- myapplication arg1 arg2
-        sudo perf report
+  sudo perf record -e 'cycles' -- myapplication arg1 arg2
+  sudo perf report
 
 下面是一个报告的例子：
 
-        .. figure:: _static/perf6.jpg
+  .. figure:: _static/perf6.jpg
 
 perf record在当前目录产生一个perf.data文件（如果这个文件已经存在，旧的文件会被
 改名为perf.data.old），用来记录过程数据。之后运行的perf report命令会输出统计的
@@ -622,7 +610,7 @@ perf.data保留前一个版本，可以支持perf diff这个命令，这个命�
 区别。这样你可以用不同参数运行你的程序，看看运行结果有什么不同，用前面这个cs程
 序为例，我用4线程对比2线程，就有如下结果：
 
-        .. figure:: _static/perf7.jpg
+  .. figure:: _static/perf7.jpg
 
 我们这里看到，增加线程后，heavy_cal的占比大幅下降了10.70%，其他的变化不大。
 
@@ -634,14 +622,14 @@ perf record不一定用于跟踪自己启动的进程，通过指定pid，可以
 样可以跟踪整个系统的性能。比如，还是前面这个cs程序的跟踪，如果我用-a命令去跟踪
 ，得到的结果就和原来很不一样了：
 
-        .. figure:: _static/perf8.jpg
+  .. figure:: _static/perf8.jpg
 
 大家注意一下Command那一列。那里已经不仅仅有cs这个进程了。
 
 perf report是一个菜单接口，可以一直展开到每个函数的代码的，例如我们要展开上面这
 个heavy_cal()函数的具体计数，我们在上面回车，选择代码分析，我们可以得到：
 
-        .. figure:: _static/perf9.jpg
+  .. figure:: _static/perf9.jpg
 
 perf record还有其他参数可以控制，例如可以通过-c指定事件的触发的事件次数等，那个
 读者们可以自己看手册。
@@ -649,18 +637,18 @@ perf record还有其他参数可以控制，例如可以通过-c指定事件的�
 和perf record/report类似的还有一个perf stat命令，这个命令不计算分布，仅仅进行统
 计，类似这样：
 
-        .. figure:: _static/perf10.jpg
+  .. figure:: _static/perf10.jpg
 
 一般情况下，我觉得这个功能用不上。
 
-堆栈跟踪
---------
+### 堆栈跟踪
+
 
 perf的跟踪有一个错觉需要我们注意，假设我们有一个函数abc()，调用另一个函数def()
 ，在perf的统计中，这两者是分开统计的，就是说，执行def的时间，是不计算abc的时间
 的，图示如下：
 
-        .. figure:: _static/perf11.png
+  .. figure:: _static/perf11.png
 
 这里，abc()被击中5次，def()被击中5次，ghi被击中1次。这会给我们不少错觉，似乎abc
 的计算压力不大，实际上不是，你要把def和ghi计算在内才行。
@@ -671,12 +659,12 @@ perf的跟踪有一个错觉需要我们注意，假设我们有一个函数abc(
 这种情况我们可以启动堆栈跟踪，也就是每次击中的时候，向上回溯一下调用栈，让调用
 者也会被击中，这样就就更容易看出问题来，这个原理类似这样：
 
-        .. figure:: _static/perf12.png
+  .. figure:: _static/perf12.png
 
 这种情况，abc击中了11次，def击中了6次，而ghi击中了1次。这样我们可以在一定程度上
 更容易判断瓶颈的位置。-g命令可以实现这样的跟踪，下面是一个例子：
 
-        .. figure:: _static/perf13.jpg
+  .. figure:: _static/perf13.jpg
 
 使用堆栈跟踪后，start_thread上升到前面去了，因为正是它调的heavy_cal。
 
@@ -691,10 +679,9 @@ perf的跟踪有一个错觉需要我们注意，假设我们有一个函数abc(
 还有一种更奇葩的情况是，部分平台使用简化的堆栈回溯机制，在堆栈中看见一个地址像
 是代码段的地址，就认为是调用栈，这些情况都会引起堆栈跟踪上的严重错误。使用者应
 该对系统的ABI非常熟悉，才能很好驾驭堆栈跟踪这个功能的。
+  
+### 其他功能
 
-
-其他功能
----------
 
 perf是现在Linux中主推的性能分析工具，几乎每次升级都会有重大更新，连什么
 benchmarking的功能都做进来了，还有用于专项分析perf-mem这样的命令，用来产生脚本
@@ -704,17 +691,15 @@ benchmarking的功能都做进来了，还有用于专项分析perf-mem这样的
 不过特别提一下script命令，虽然它的功能看起来只是用来产生分析脚本的，但我们还常
 常用来导出原始分析数据，读者可以在perf-record后直接用这个命令来导出结果：::
 
-        sudo perf script
+  sudo perf script
 
 输出：
-        .. figure:: _static/perf14.jpg
-
-
+  .. figure:: _static/perf14.jpg
+  
 这里列出每个击中点，你爱怎么处理这些击中点的数据，就全凭你的想象力了。
+  
+### perf跟踪的缺陷
 
-
-perf跟踪的缺陷
----------------
 
 前面已经强调过了，perf跟踪是一种采样跟踪，所以我们必须非常小心采样跟踪本身的问
 题，一旦模型设置不好，整个分析结果可能都是错的。我们要时刻做好这种准备。
@@ -738,8 +723,7 @@ perf还有一个问题是对中断的要求，perf很多事件都依赖中断，
 问题不存在。但在大部分ARM/ARM64平台上，这个问题都没有解决，所以看这种平台的报告
 ，都要特别小心，特别是你看到_raw_spin_unlock()一类的函数击中极高，你就要怀疑一
 下你的测试结果了（注意，这个结果也是能用的，只是看你怎么用）。
-
-
+  
 小结
 ----
 
@@ -747,11 +731,10 @@ perf还有一个问题是对中断的要求，perf很多事件都依赖中断，
 要用好也不是那么容易的，我们首先应该掌握它的原理，然后基于一个分析模型逐步用
 perf来验证我们的猜测，我们才有可能真正发现问题。 
 
-怎么开始
-========
+## 怎么开始
 
-战地分析
---------
+### 战地分析
+
 
 性能分析常常是一种战地分析，所以，在我们可以端起咖啡慢慢想怎么进行分析之前，我
 们要先说说我们在战地上的套路。
@@ -787,8 +770,8 @@ ifconfig啦，ps -ef -L啦，/var/log啦，统统先给他扯一套出来，这�
 
 这样，现场的工作就差不多了，出去和开始请客户的运维人员吃饭喝酒套近乎吧。
 
-离线分析
---------
+### 离线分析
+
 
 离线分析的第一件事是——点杯咖啡？
 
@@ -831,35 +814,35 @@ ifconfig啦，ps -ef -L啦，/var/log啦，统统先给他扯一套出来，这�
 ，它模拟了一组线程产生数据，写入队列，然后另一组线程把数据取出来，完成整个计算
 的过程，计算用heavy_cal函数来模拟。我们的目标是尽量提高计算的通量。所以，我们首
 先看4线程的一般运行的结果：
-        
-        .. figure:: _static/tune1.png
+  
+  .. figure:: _static/tune1.png
 
 这个每秒处理175K的任务。但CPU还有空闲。可能是因为我们在每个线程计算的时候有IO，
 导致效率上不去，我们用更多的线程（40个）来填掉这些IO的等待，结果提升非常有限：
 
-        .. figure:: _static/tune2.png
+  .. figure:: _static/tune2.png
 
 简单解决不了这个问题了，我们看看ftrace的数据：
 
-        .. figure:: _static/tune3.png
+  .. figure:: _static/tune3.png
 
 看见没有，cs的线程执行不到5个微秒就休眠了，搞什么飞机？
 
 这个函数这样写的：::
 
-        void * pro_routin(void * arg) {
-                struct task * tsk = arg;
-                int ret;
+  void * pro_routin(void * arg) {
+  struct task * tsk = arg;
+  int ret;
 
-                srand((intptr_t)tsk->arg);
+  srand((intptr_t)tsk->arg);
 
-                while(1) {
-                        ret = heavy_cal(rand(), n_p_cal);
-                        en_q(ret);
-                        marker("yield here");
-                        yield_method_f();
-                }
-        }
+  while(1) {
+  ret = heavy_cal(rand(), n_p_cal);
+  en_q(ret);
+  marker("yield here");
+  yield_method_f();
+  }
+  }
 
 heavy_cal是纯计算，不会引起无意义的休眠，marker在内核中是用spin_lock保护的，不
 会引起休眠，唯一有可能休眠的是yield和en_q()（写入队列），我们清掉yield试试，发
@@ -877,16 +860,14 @@ ftrace数据，它是这样的：
 但都没有引起调度，整体性能就提上去了。
 
 我们还有办法可以把剩下的那些时间用起来，不过这只是个例子，就到此为止吧。
-
-
+  
 总结
 -----
 
 本文介绍了最基本的性能分析流程，后面我们会具体讨论一些常见的分析模型，加深对这
 些模型的理解。
 
-Amdahl模型
-===========
+## Amdahl模型
 
 前言
 -----
@@ -913,8 +894,8 @@ cs这个程序的模型，是我们很多软件的基础模型。虽然经过很
 图方便为了排队，使用一个模块队列+线程来完成这样的工作。正确的做法是把这个模块的
 接口直接做成函数，然后用锁保护起来。
 
-Amdahl模型
-----------
+### Amdahl模型
+
 
 前面说的这种不使用短时线程会话的策略，在大部分时候是不会引起问题的，除非你线程
 配置不平衡，让你的调度序列又出现交互线程。这些问题，都可以通过ftrace跟踪出来。
@@ -930,18 +911,18 @@ Amdahl定律是并行计算最基础的理论了，所有学计算机的人都�
 顶的规模，下面这个是我用999:1的比例配置并行-串行比时（程序参考btest的amdahl的例
 子），在72核的x86平台上得到的效果：
 
-        .. figure:: _static/tune4.png
+  .. figure:: _static/tune4.png
 
 这时增加核数基本上就会达到提升处理能力的目的。
 
 但时延上仍是有影响的：
 
-        .. figure:: _static/tune5.png
+  .. figure:: _static/tune5.png
 
 在串行的密度非常低的时候，我们还感觉一切受控，但如果我们把并行串行比提升到99:1
 ，乃至90:10的时候，情况就变得非常糟糕了：
 
-        .. figure:: _static/tune6.png
+  .. figure:: _static/tune6.png
 
 因为这不再是一个Amdahl模型了，Amdahl模型的依赖是在等待的时候，你的CPU还能干其他
 并行的工作，而使用spinlock，你在等待的时候什么都干不了。这实际上是一个马可夫链
@@ -956,7 +937,7 @@ Amdahl定律是并行计算最基础的理论了，所有学计算机的人都�
 马可夫链模型，形成了跳水。如果用perf对这两种情况进行跟踪，你会发现，在系统发生
 跳水后，系统在的指令执行效率10个cycle执行不了一条指令：
 
-        .. figure:: _static/tune7.png
+  .. figure:: _static/tune7.png
 
 很低的指令执行率，表明执行指令本身的执行效率低（基本在stalled-cycles上，这个指
 标的含义，我们后面专门写一篇blog介绍），问题要不出现在cache/总线上，要不出现在
@@ -969,13 +950,13 @@ Amdahl定律是并行计算最基础的理论了，所有学计算机的人都�
 
 使用MCS锁后，上面的测试结果是这样的：
 
-        .. figure:: _static/tune8.png
+  .. figure:: _static/tune8.png
 
 同样的行为在ARM64上测试结果也是一致的，理论上说，如果用ticket锁，在ARM上可以获
 得MCS锁一样的结果，我晚点加一个测试看看。
 
-Amdahl模型的启示
------------------
+### Amdahl模型的启示
+
 
 我们很多人更愿意花时间去反复尝试各种设置参数，尝试这样提高系统的性能。我个人收
 到不少性能分析报告都是这样的。我觉得这样的分析报告相对来说价值是比较低的（当然
@@ -1000,8 +981,7 @@ Amdahl模型的启示
 
 调度模型平衡了，我们就有可能进行下一步，针对CPU执行效率的分析了。
 
-理解一些基础的CPU执行模型
-=========================
+## 理解一些基础的CPU执行模型
 
 介绍
 ----
@@ -1013,8 +993,8 @@ Amdahl模型的启示
 专门讨论一下CPU的执行模型，看看我们在算法本身以外，还可以怎么优化我们程序的执行
 模型。
 
-流水线
-------
+### 流水线
+
 
 在不少软件人员的想象中，似乎只要保证CPU的占用率是100%，CPU应该是很忙的，应该在
 执行完一条指令，然后执行下一条指令，没有空干别的事情。
@@ -1023,14 +1003,14 @@ Amdahl模型的启示
 执行部件，这些执行部件在CPU时钟的驱动下，一跳一跳地完成每一个动作，并完成一个指
 令一个指令的执行，这个执行流程就会是这样的：
 
-        .. figure:: _static/in_cpu1.png
+  .. figure:: _static/in_cpu1.png
 
 看见了把，如果CPU真的这样执行，“取指”这个部件在一条指令的执行中，有三跳（CPU称
 为时钟周期）其实是“闲”着的。
 
 所以，合理的模型应该是这样的：
 
-        .. figure:: _static/in_cpu2.png
+  .. figure:: _static/in_cpu2.png
 
 也就是说，i1（被取指这个部件）执行后，取指部件反正闲着也是闲着，不如就直接执行
 下一条指令的取指就好了。这样算起来，其实不是4个时钟周期执行一条指令的，实际上是
@@ -1044,20 +1024,20 @@ Amdahl模型的启示
 现代CPU的流水线是很长的，比如ARM的A57，流水线长度超过15。所以，看起来一条指令需
 要15个时钟周期，实际上你只需要1个时钟周期就可以执行一条指令。
 
-流水线的破坏1：指令依赖
------------------------
+### 流水线的破坏1：指令依赖
+
 
 前面这个模型看起来很美，但实际上不是这样的，有很多问题会破坏流水线。最常见的破
 坏是指令依赖。比如你写如下汇编：::
 
-        add r1, r2, r3 #r1=r2+r3
-        add r1, 1 #r1=r1+1
-        add r4, 2
+  add r1, r2, r3 #r1=r2+r3
+  add r1, 1 #r1=r1+1
+  add r4, 2
 
 这里第一条指令计算r1，第二条指令使用r1，第一条指令没有执行完，第二条指令译码完
 了，一看，我靠，要用r1，前面的还没有搞完，等等吧，就成这样了：
 
-        .. figure:: _static/in_cpu3.png
+  .. figure:: _static/in_cpu3.png
 
 你看，CPU其实又闲下来了。(注：有人说，这个地方处理器可以通过寄存器改名实现不用
 等待，这句话没有错，但其实芯片不止这一种优化方法，我们要理解核心逻辑，在主线逻
@@ -1067,7 +1047,7 @@ Amdahl模型的启示
 高级的CPU，编译器，都会进行指令调度。比如我们看到第三条指令跟谁没有没有依赖，我
 们可以把它调整到第二条的前面，这样可以填补一定的时间空间，这个执行会变成这样：
 
-        .. figure:: _static/in_cpu4.png
+  .. figure:: _static/in_cpu4.png
 
 这个效率就又高了一点了。
 
@@ -1080,37 +1060,36 @@ Amdahl模型的启示
 思维），而编译器考虑这样的东西，毫无压力。所以，我们只在流水线特别糟糕的地方考
 虑用汇编优化一下，而不会吃饱没事到处写汇编。这也是为什么多言数穷，不如守中。大
 家都想耍小聪明，这个系统就不聪明了，各守本分才“合道”。
+  
+### 流水线的破坏2：跳转
 
-
-流水线的破坏2：跳转
---------------------
 
 跳转指令也会引起流水线的破坏。考虑如下序列：::
 
-        1：
-        ...
-        add r1, r2, r3
-        jmp 1b  #jump back to label 1
-        add r2, 1
-        add r3, 2
+  1：
+  ...
+  add r1, r2, r3
+  jmp 1b  #jump back to label 1
+  add r2, 1
+  add r3, 2
 
 流水线确实把4条指令都执行了，但没有什么鬼用，因为第二条指令跳转到别的地方去了，
 后面两条指令执行了也是白执行。这种情况叫“指令预测失效”，也是破坏流水线的行为。
 
 所以你经常看到一些高性能程序里面写这样的代码：::
 
-        for(i=0; i<800; i+=4) {
-          a[i] = x;
-          a[i+1] = x;
-          a[i+2] = x;
-          a[i+3] = x;
-        }
+  for(i=0; i<800; i+=4) {
+  a[i] = x;
+  a[i+1] = x;
+  a[i+2] = x;
+  a[i+3] = x;
+  }
 
 这个代码看起来完全可以用这样一个简单的代码代替：::
 
-        for(i=0; i<800; i++) {
-          a[i] = x;
-        }
+  for(i=0; i<800; i++) {
+  a[i] = x;
+  }
 
 而作者要写成上面那个鬼样子，很多时候就是为了优化流水线。让跳转不要那么快发生。
 但还是那句话，不要在开始设计的时候就优化，否则自取其辱。
@@ -1118,27 +1097,27 @@ Amdahl模型的启示
 如果读者习惯Linux的代码，会经常看到likely和unlikely这个宏，它的作用也是这个，考
 虑一下如下汇编：::
 
-        xor r1, r1, r1
-        jz 2f #jump forward to label 2 if zero
-        add r2, r2, 1
-        ...
-        2:
+  xor r1, r1, r1
+  jz 2f #jump forward to label 2 if zero
+  add r2, r2, 1
+  ...
+  2:
 
 我们把分支放在jz后面还是放在2:后面呢？放在jz后面预测就会成功，放到2:后面预测就
 会失败。那我们就应该把最可能的结果放在jz后面，所以我们才有likely和unlikely，通
 知编译器，谁才是最有可能的，这样也能有效提高CPU的执行效率。
 
-流水线的破坏3：内存访问和Cache模型
-----------------------------------
+### 流水线的破坏3：内存访问和Cache模型
+
 
 指令依赖中， 有一种依赖是要特别注意的，就是访存指令。访问内存是很慢的，你这样想
 象一下吧：我们执行一条指令可能就是几个时钟周期，但访问一次内存的时间可能就是几
 百个时钟周期。想象一下下面这个执行过程：::
 
-        ldr r1, [addr1]
-        add r1, r1, 3
-        add r2, r2, 4
-        add r3, r3, 5
+  ldr r1, [addr1]
+  add r1, r1, 3
+  add r2, r2, 4
+  add r3, r3, 5
 
 你以为这4条指令在一个流水线周期里就可以执行完了，实际是几百个时钟周期。这个效率
 一下就慢下来了。
@@ -1148,7 +1127,7 @@ Amdahl模型的启示
 
 这种时候，我们就要依赖Cache了，现代CPU系统有多级Cache，类似这样：
 
-        .. figure:: _static/in_cpu5.png
+  .. figure:: _static/in_cpu5.png
 
 L1 Cache中有的，就从L1取，没有的就从L2取，……如此类推。这个问题考虑到他们的速度
 的时候，你就会发现其实是很严重的。
@@ -1169,16 +1148,15 @@ Cache中，这也能大大提高效率。
 这个有很多论文了，我就不介绍了。基本上不是专业的研究者，我们也不用专门去记住这
 些模型，我们只要按功能，按软件构架的要求，把代码写出来，然后通过profiling工具去
 发现密集出现branch-miss，cache-miss的地方，根据情况作出优化就好了。
+  
+### 异步调度模型
 
-
-异步调度模型
--------------
 
 上面我们给了一个基本的流水线模型。但实际上……呵呵，又来了……这种叫同步模型，现代
 的CPU，基本上不是这样的同步模型。现在CPU是异步调度模型。类似下面这样（网上随便
 找的图，侵删）：
 
-        .. figure:: _static/in_cpu6.png
+  .. figure:: _static/in_cpu6.png
 
 从中间开始，CPU的执行分成了两段。前面一段是取指有关的操作，后面一段是执行有关的
 操作。CPU有很多的执行通道，可以有多个定点或者浮点加法器，几个取指器等等。这样，
@@ -1190,14 +1168,14 @@ Cache中，这也能大大提高效率。
 
 下面这个是Intel的一个Top Down模型（侵删）：
 
-        .. figure:: _static/in_cpu7.jpg
+  .. figure:: _static/in_cpu7.jpg
 
 前面一段就是取指有关的，是In-Order的操作，这部分是符合原来的流水线模型的。后面
 一段就是纯粹的调度。这个性能就不能完全按严格的流水线模型来考虑（加上超线程技术
 就会更加复杂）。所以现在你用perf stat执行一个程序，它会给你这个总结（不是每个
 CPU都支持这两个统计）：
 
-        .. figure:: _static/in_cpu8.png
+  .. figure:: _static/in_cpu8.png
 
 你可以看到了，它首先给你统计了一个stalled-cycles-frontend，和一个
 stalled-cycles-backend，通过这两个统计，你可以看到，无论你如何执行，你的系统到
@@ -1227,8 +1205,7 @@ Intel处理器上，这个模型称为Top-Down模型（现在ARMv8也开始用�
 这就是我们说的：执古之道，以御今只有，能知古始，是谓道纪。我们能掌握现在的复杂
 局面，我们必须回到最开始解决的问题上，我们才有可能理解和控制现在的一切变化。
 
-IO等待问题
-==========
+## IO等待问题
 
 介绍
 -----
@@ -1245,8 +1222,8 @@ IO问题和这个没有什么两样，只是计算资源换成了IO资源。CPU�
 
 比如在top中，我们最常见的一个参数是load：
 
-        .. figure:: _static/iotune1.png
-        
+  .. figure:: _static/iotune1.png
+  
 这个就是运行队列的长度（top显示了1，5，15分钟的平均值），根据我们有多少个CPU，
 我们就大概知道系统有多忙了（不过这个值不太容易用，因为消化进程的速度不是个定值
 ，取决于这个进程的需求）。
@@ -1255,8 +1232,8 @@ IO问题和这个没有什么两样，只是计算资源换成了IO资源。CPU�
 绍这两个子系统的跟踪，我对这两个子系统不是太熟悉，这里仅仅是通过写作，把一些破
 碎的知识组合起来，不当之处，请读者指正。
 
-网络子系统
------------
+### 网络子系统
+
 
 网络子系统很复杂，但只考虑队列就会相对简单。网络子系统的队列在socket上，当你没
 有对应socket的时候，收到的包要不要转发，要不直接就drop了，只有你有Socket的时候
@@ -1266,10 +1243,10 @@ IO问题和这个没有什么两样，只是计算资源换成了IO资源。CPU�
 可以在ethtool -S和netstat -s中看到由于这些原因drop掉的包，前者是硬件层的统计，
 后者是协议栈中的统计。下面是我们一款自产网卡的统计结果：
 
-        .. figure:: _static/iotune2.jpg
+  .. figure:: _static/iotune2.jpg
 
 _
-        .. figure:: _static/iotune3.jpg
+  .. figure:: _static/iotune3.jpg
 
 (ethtool -S的结果是实现相关的，每款网卡都不一样）
 
@@ -1287,15 +1264,15 @@ _
 三个子系统和网络协议栈相关，其中sock可以跟踪socket超限的事件，napi可以跟踪网卡
 收报的调度，net可以跟踪收发的动作。
 
-        .. figure:: _static/iotune4.jpg
+  .. figure:: _static/iotune4.jpg
 
-存储子系统
-----------
+### 存储子系统
+
 
 存储子系统主要依靠块设备子系统发挥作用，通过iostat我们可以有一个初步的统计结果
 ：
 
-        .. figure:: _static/iotune5.png
+  .. figure:: _static/iotune5.png
 
 这其中有三类参数，一个是实际的带宽，我们可以用这个来比较物理设备的线速。第二个
 是队列的平均长度，avgqu-sz。还有一个是队列中每个元素从进入队列到离开队列的平均
@@ -1311,25 +1288,25 @@ ftrace的blk tracer来跟。echo blk > current_tracer中就可以实施专门针
 下面对这个块设备的跟踪进行支持（比如enable，filter等），下面是我随便对一台PC的
 sda的跟踪：
 
-        .. figure:: _static/iotune5.png
+  .. figure:: _static/iotune5.png
 
 其中那个动作标记的含义从代码上就可以找出来：::
 
-        [__BLK_TA_QUEUE]        = {{  "Q", "queue" },      blk_log_generic },g
-        [__BLK_TA_BACKMERGE]    = {{  "M", "backmerge" },  blk_log_generic },g
-        [__BLK_TA_FRONTMERGE]   = {{  "F", "frontmerge" }, blk_log_generic },g
-        [__BLK_TA_GETRQ]        = {{  "G", "getrq" },      blk_log_generic },g
-        [__BLK_TA_SLEEPRQ]      = {{  "S", "sleeprq" },    blk_log_generic },g
-        [__BLK_TA_REQUEUE]      = {{  "R", "requeue" },    blk_log_with_error },g
-        [__BLK_TA_ISSUE]        = {{  "D", "issue" },      blk_log_generic },g
-        [__BLK_TA_COMPLETE]     = {{  "C", "complete" },   blk_log_with_error },g
-        [__BLK_TA_PLUG]         = {{  "P", "plug" },       blk_log_plug },g
-        [__BLK_TA_UNPLUG_IO]    = {{  "U", "unplug_io" },  blk_log_unplug },g
-        [__BLK_TA_UNPLUG_TIMER] = {{ "UT", "unplug_timer" }, blk_log_unplug },g
-        [__BLK_TA_INSERT]       = {{  "I", "insert" },     blk_log_generic },g
-        [__BLK_TA_SPLIT]        = {{  "X", "split" },      blk_log_split },g
-        [__BLK_TA_BOUNCE]       = {{  "B", "bounce" },     blk_log_generic },g
-        [__BLK_TA_REMAP]        = {{  "A", "remap" },      blk_log_remap },g
+  [__BLK_TA_QUEUE]        = {{  "Q", "queue" },      blk_log_generic },g
+  [__BLK_TA_BACKMERGE]    = {{  "M", "backmerge" },  blk_log_generic },g
+  [__BLK_TA_FRONTMERGE]   = {{  "F", "frontmerge" }, blk_log_generic },g
+  [__BLK_TA_GETRQ]        = {{  "G", "getrq" },      blk_log_generic },g
+  [__BLK_TA_SLEEPRQ]      = {{  "S", "sleeprq" },    blk_log_generic },g
+  [__BLK_TA_REQUEUE]      = {{  "R", "requeue" },    blk_log_with_error },g
+  [__BLK_TA_ISSUE]        = {{  "D", "issue" },      blk_log_generic },g
+  [__BLK_TA_COMPLETE]     = {{  "C", "complete" },   blk_log_with_error },g
+  [__BLK_TA_PLUG]         = {{  "P", "plug" },       blk_log_plug },g
+  [__BLK_TA_UNPLUG_IO]    = {{  "U", "unplug_io" },  blk_log_unplug },g
+  [__BLK_TA_UNPLUG_TIMER] = {{ "UT", "unplug_timer" }, blk_log_unplug },g
+  [__BLK_TA_INSERT]       = {{  "I", "insert" },     blk_log_generic },g
+  [__BLK_TA_SPLIT]        = {{  "X", "split" },      blk_log_split },g
+  [__BLK_TA_BOUNCE]       = {{  "B", "bounce" },     blk_log_generic },g
+  [__BLK_TA_REMAP]        = {{  "A", "remap" },      blk_log_remap },g
 
 基本如果你对Linux的IO调度器比较熟悉，很容易就找到整个调度中的时延在什么地方引起
 的。这里有一个简单的解释，读者可以参考：blktrace User Guide
@@ -1338,11 +1315,11 @@ sda的跟踪：
 就可以直接通过blktrace -d /dev/sda跟踪sda的行为，然后用blkparse sda来看结果，比
 如这样：
 
-        .. figure:: _static/iotune6.png
+  .. figure:: _static/iotune6.png
 
 live输出的命令是：::
 
-        blktrace -d /dev/sda -o - | blkparse -i -
+  blktrace -d /dev/sda -o - | blkparse -i -
 
 具体这个调度模型如何理解，我们在后面的文档中介绍。
 
@@ -1353,8 +1330,7 @@ live输出的命令是：::
 统调优问题的，但他的问题其实更多关注在虚拟机上，虚拟机的问题和IO是两个相对独立
 的主题，所以，这里先独立介绍IO有关的跟踪方法，虚拟机我们独立讨论。
 
-Docker环境
-==========
+## Docker环境
 
 本篇讨论一下在docker环境中，前面说到的各种性能分析策略的变化。
 
@@ -1369,7 +1345,7 @@ Nick-host。这就叫名称空间。
 
 一个简单的体验名称空间的方法是运行::
 
-        unshare -u /bin/bash
+  unshare -u /bin/bash
 
 然后你用hostname mynewname修改一下你的hostname，你会发现在这个bash中hostname确
 实已经修改了，但你从其他console进入你的系统，再看看hostname，它还是原来的值。
@@ -1384,8 +1360,8 @@ Nick-host。这就叫名称空间。
 
 比如说，你启动了一个docker的shell，例如这样：::
 
-        busy_app
-        docker run -ti --rm centos /bin/bash
+  busy_app
+  docker run -ti --rm centos /bin/bash
 
 你现在主系统上运行了一个busy_app，然后你进入你的docker，之后你在docker中用运行
 top，你会发现你的docker中看不见busy_app，但top显示的load参数仍然很高。系统没有
@@ -1408,8 +1384,7 @@ Docker使用overlayfs（文件类型是overlay）作为基础文件系统支持�
 落在SAS驱动上）。但无论如何，这个我们仍可以使用传统的磁盘跟踪方法来发现这部分的
 性能瓶颈。
 
-KVM环境
-=======
+## KVM环境
 
 这一篇看KVM环境的性能优化技巧。我没有怎么做过KVM环境的调优，但后面就要开始做了
 ，所以这一篇也只是把资料整合一下，后面会逐步补充。
@@ -1418,8 +1393,8 @@ KVM和Docker不同，KVM是有Hypervisor的。也就是说，一旦KVM陷入Gues
 看不见被占用的CPU的。
 
 这个执行模型类似这样：
-        
-        .. figure:: _static/kvmtune1.png
+  
+  .. figure:: _static/kvmtune1.png
 
 这里的横坐标是CPU时间。我做了很多的简化，以便读者更容易基于一个相对稳固的模型思
 考相关变化。
@@ -1441,7 +1416,7 @@ Host种进去的，它只能统计它自己看到的点。
 不过，新版本的top和vmstat都支持steal time功能了，注意一下CPU占用率中那个st的值
 ，它表示了本VM有多少时间被Hypervisor“偷走了”：
 
-        .. figure:: _static/kvmtune2.png
+  .. figure:: _static/kvmtune2.png
 
 同时，绝对时间是可以被Guest感知的，所以，如果其他Guest很忙，本Guest的执行时间会
 延长，感觉就好像某些指令被降低了执行速度一样。
@@ -1449,7 +1424,7 @@ Host种进去的，它只能统计它自己看到的点。
 从Host一侧跟踪KVM的行为，我们可以跟踪到进入和离开guest的时间，这个可以通过跟踪
 ftrace的kvm:* 事件得到：
 
-        .. figure:: _static/kvmtune3.png
+  .. figure:: _static/kvmtune3.png
 
 kvm_entry就是进入虚拟机的入口点，kvm_exit是离开点，里面会给出离开的原因，很大一
 部分会是因为中断或者IO，一旦进入IO，这部分处理的性能就是可以被Host系统监控到了
@@ -1472,7 +1447,7 @@ perf（在host一侧）提供了完整的KVM跟踪功能（但很可惜，这还
 
 比如，这样可以启动一个完整的3秒跟踪：::
 
-        sudo perf kvm --guestmodules the_modules --guestkallsyms the_kallsyms --guestvmlinux the_vmlinux --guest --host record -a -- sleep 3
+  sudo perf kvm --guestmodules the_modules --guestkallsyms the_kallsyms --guestvmlinux the_vmlinux --guest --host record -a -- sleep 3
 
 如何报告，估计也不需要我来解释了。
 
@@ -1481,12 +1456,11 @@ perf（在host一侧）提供了完整的KVM跟踪功能（但很可惜，这还
 --guestmodules和--guestkallsyms了。一般的操作方法是通过sshfs把guest文件系统整个
 牟尼它到本地：::
 
-        sudo sshfs -o allow_other,direct_io ken@192.168.122.84:/ /tmp/sshfs
+  sudo sshfs -o allow_other,direct_io ken@192.168.122.84:/ /tmp/sshfs
 
 之后指定这个/tmp/sshfs就可以了。
 
-理解Linux调度模型
-=================
+## 理解Linux调度模型
 
 介绍
 ----
@@ -1497,8 +1471,8 @@ perf（在host一侧）提供了完整的KVM跟踪功能（但很可惜，这还
 介绍一个两个的调度算法不能解决调优的问题，我们要理解的是这些算法背后不变的东西
 ，然后根据情况看代码才有意义。
 
-单核调度
----------
+### 单核调度
+
 
 Linux的调度算法换过很多次了，最新的调度算法称为CFS（完全公平调度器），在我们介
 绍这个算法的特点前，我们先理解一下调度器到底解决什么问题。
@@ -1542,8 +1516,8 @@ CFS没有这个问题，CFS的算法是这样的：给每个在调度队列中�
 有了这个基础，线程的nice值就仅仅是个如何加权的问题了。比如在CFS算法中，nice值作
 为vruntime流逝的加权， 这个nice大的进程时间流逝就快，它占据的时间片就少了。
 
-多核调度
---------
+### 多核调度
+
 
 多核调度其实是单核调度算法的复制。多核的CPU其实互相是看不到对方的，CPU不过就是
 一条指令一条指令向下执行。所谓多核调度，就是每个CPU有一个run queue（下面简称rq
@@ -1572,20 +1546,20 @@ CPU的组成结构，但真正有哪些domain，以及domain的参数，则需�
 
 其他问题还是留给调度器专家吧。
 
-功耗问题
---------
+### 功耗问题
+
 
 在服务器上，我们一般只关注通量和时延，但现在的调度器开始要关心功耗问题了。这个
 真的让这个问题变成一个数学问题了。功耗要考虑的要素包括几个：
 
 1. 休眠：CPU休眠就可以降功耗，那么你是把两个任务放两个CPU上以便提高速度呢？还是
-   把它们合并到一个CPU上让其中一个CPU休眠呢？
+  把它们合并到一个CPU上让其中一个CPU休眠呢？
 
 2. DVFS：CPU可以调频来降功耗，还是那句话，你是把两个任务合并到一个CPU上，让另一
-   个休眠呢，还是分在两个CPU上，让两个一起降频呢？
+  个休眠呢，还是分在两个CPU上，让两个一起降频呢？
 
 3. CPU热插拔：休眠可以降功耗，但比不上把这个CPU直接下电，但下了电，要恢复就很不
-   容易了，那你要更快恢复还是要降功耗呢？
+  容易了，那你要更快恢复还是要降功耗呢？
 
 ARM现在尝试通过AWS项目（Energy-Aware Scheduling (EAS) Project）把这三个要素整合
 在一起。但最终内核会修改成什么样子，还有待观察。在EAS可以商用前，每个手机还要考
@@ -1593,17 +1567,15 @@ ARM现在尝试通过AWS项目（Energy-Aware Scheduling (EAS) Project）把这�
 
 谢天谢地，我现在不用搞手机了：） 
 
-磁盘IO的调度模型
-================
+## 磁盘IO的调度模型
 
 介绍
 -----
 
 这一篇讲磁盘IO的模型。
+  
+### Linux文件IO子系统
 
-
-Linux文件IO子系统
------------------
 
 Linux的文件IO子系统是Linux中最复杂的一个子系统（没有之一）。读者可以参考以下这
 个图：
@@ -1611,7 +1583,7 @@ https://www.thomas-krenn.com/de/wikiDE/images/2/2d/Linux-storage-stack-diagram_v
 
 如果你懒得跳过去，这里贴一个：
 
-        .. figure:: _static/linuxio.png
+  .. figure:: _static/linuxio.png
 
 你什么细节都看，这个图肯定把你搞晕了。我们还是用找“道纪”的方式一点点复盘这个设
 计。
@@ -1636,10 +1608,9 @@ https://www.thomas-krenn.com/de/wikiDE/images/2/2d/Linux-storage-stack-diagram_v
 纯软件模型，用一般热点方法分析就可以了。
 
 本文主要关注下半部分的通用部分的模型，也就是上面图中Block Layer的运行模型。
+  
+### Block Layer调度模型
 
-
-Block Layer调度模型
---------------------
 
 数据从Pagecache同步到磁盘上，发出的请求称为一个request，一个request包含一组bio
 ，每个bio包含要同步的数据pages，你要把Page和磁盘的数据进行同步。
@@ -1665,42 +1636,38 @@ blktrace跟踪到的事件的含义：
 
 请求相关::
 
-    Q - queued：bio请求进入调度
-    G - get request：分配request
-    I - inserted：request进入io调度器
-
-
+  Q - queued：bio请求进入调度
+  G - get request：分配request
+  I - inserted：request进入io调度器
+  
 调度相关::
 
-    B - bounced：硬件无法访问内存，需要把内存降低到硬件可访问
-    M - back merge：请求和前一个从后面合并
-    F - front merge：请求和前一个从前面合并
-    X - split：请求分析为多个request（很可能是因为硬件不支持太大的请求）
-    A - remap：基于分区等，重新映射request的位置
-    R - requeue: Request重新回到调度队列
-    S - sleep：调度器进入休眠P - plug：调度队列插入设备（准备合并）
-    U - unplug：调度队列离开设备（全部一次写入设备中）
-    T - unplug due to timer超时，而不是数据足够发起的unplug
-
-
+  B - bounced：硬件无法访问内存，需要把内存降低到硬件可访问
+  M - back merge：请求和前一个从后面合并
+  F - front merge：请求和前一个从前面合并
+  X - split：请求分析为多个request（很可能是因为硬件不支持太大的请求）
+  A - remap：基于分区等，重新映射request的位置
+  R - requeue: Request重新回到调度队列
+  S - sleep：调度器进入休眠P - plug：调度队列插入设备（准备合并）
+  U - unplug：调度队列离开设备（全部一次写入设备中）
+  T - unplug due to timer超时，而不是数据足够发起的unplug
+  
 发出相关::
 
-    C - complete：完成一个request的调度（无论成功还是失败）
-    D - issued：发送到设备，这个是从下层硬件驱动发起的
-
-
+  C - complete：完成一个request的调度（无论成功还是失败）
+  D - issued：发送到设备，这个是从下层硬件驱动发起的
+  
 我们通过对这些事件的跟踪，对照硬件的特性大概就可以知道运行的模型是否正常了。
+  
+### 多调度器支持
 
-
-多调度器支持
-------------
 
 但情况千变万化，不是每种磁盘，每个场景都可以用一样的算法。所以，现在Linux可以支
 持多个IO调度器，你可以给每个磁盘制定不同的调度算法，这个在
 /sys/block/<dev>/queue/scheduler中设置。它的用户接口设计得很好，你看看它的内容
 就明白我的意思了：::
 
-        noop [deadline] cfq
+  noop [deadline] cfq
 
 上面三个是我的PC上支持的三个算法，其中被选中的算法是deadline，写另一个名字进去
 可以选定另一个调度算法。
@@ -1723,7 +1690,7 @@ CFQ，呵呵，这个名字是不是有种特别熟悉的感觉？对了，它�
 利用这个算法，可以通过ionice设定每个任务不同的优先级，提供给调度器进行分级调度
 。例如：::
 
-        ionice -c1 -n3 dd if=/dev/zero of=test.hd bs=4096 count=1000
+  ionice -c1 -n3 dd if=/dev/zero of=test.hd bs=4096 count=1000
 
 这个命令要求后面的dd命令按三级实时策略进行调度（实时策略需要root权限）。
 
@@ -1732,10 +1699,9 @@ Desktop上使用deadline，在服务器上用QFQ。
 
 对调优来说，切换调度器和相关调度参数是最简单的方案。更多的其他考虑，那就是看你
 怎么跟踪了。
+  
+### 多队列
 
-
-多队列
--------
 
 另一方面，一个块设备一个队列的策略，面对新的存储设备，也开始变得不合时宜了。我
 们这样来体会一下这个问题：
@@ -1797,18 +1763,16 @@ iocb灌进去，然后unplug，把请求发出去。
 
 所以，对AIO的跟踪不会比一般的跟踪复杂，因为都是跟踪块设备层的方法。
 
-网络IO的调度模型
-================
+## 网络IO的调度模型
 
 介绍
 -----
 
 这一篇总结Linux网络IO的调度模型。还是那句话，这里仅仅是建一个便于讨论问题的初步
 模型，更多的信息我们在初稿出来后，有机会就慢慢调整。
+  
+### 基本模型
 
-
-基本模型
---------
 
 还是老规矩，我们从最简单的模型谈起。我们把重点放在队列和线程的模型上。
 
@@ -1834,8 +1798,7 @@ skb，并把收好的包往上送。但这两者在调度上原理一样，所�
 其实协议栈常常还有第三种执行流，就是把Linux作为一个路由器或者交换机，做转发，但
 对于大型商业应用，我们不靠CPU来做转发，这个部分的压力分析没有什么价值，我这里就
 不讨论了。
-
-
+  
 NAPI
 -----
 
@@ -1854,24 +1817,22 @@ NAPI的主要作用是应对越来越快的网络IO的需要：网络变快以�
 
 NAPI比较有趣的地方是，很多网卡的实现，无论是发还是收，其实用的都是
 NET_RX_SOFTIRQ。这个是我们分析的时候要注意的。
+  
+### Offloading
 
-
-Offloading
------------
 
 网卡的Offload特性，比如GRO等，能在很大程度上把很多CPU协议栈必须完成的工作
 Offload到网卡上，但那个和调度无关，这里忽略。
+  
+### 多队列
 
-
-多队列
--------
 
 有前面看CPU调度和存储调度的经验，我们应该很容易就看到网卡这个模型的问题了：只有
 4个线程，基本上无法充分利用多核的能力。所以现代网卡通常支持多队列。用ethtool -l
 可以查看网卡的多队列支持情况，下面是我们的网卡的多队列支持输出（每个网卡多少个
 队列可以通过BIOS配置）：
 
-        .. figure:: _static/nettune1.jpg
+  .. figure:: _static/nettune1.jpg
 
 网卡和协议栈会把数据通过特定的Hash算法分解到不同的队列上，从而实现性能的提升。
 发送方向上，协议栈通过设置skb的queue_map参数为一个包选定使用的queue，网卡驱动也
@@ -1879,14 +1840,13 @@ Offload到网卡上，但那个和调度无关，这里忽略。
 Side Scaling），它通过源、目标的IP地址和端口组成等进行Hash，算的结果通过一个转
 发表调度到不同的queue上，我们可以通过ethtool -x/X来查看或者就该这个转发表：
 
-        .. figure:: _static/nettune2.jpg
+  .. figure:: _static/nettune2.jpg
 
 网卡的多队列的模型其实挺简单的，最后就是看我们怎么分布不同网卡和内存的距离，保
 证对一个的业务在靠近的Numa Node上就好了。
+  
+### qdisc
 
-
-qdisc
-------
 
 RSS主要是针对接收方向的，发送方向的情况会更复杂一些，因为发送方向上我们需要做
 QoS（接收方向上你没法做，因为你没法随便调整送过来的消息的顺序）。Linux网络的QoS
@@ -1903,7 +1863,7 @@ qdisc支持的调度算法极多，读者们自己搜一下register_qdisc()这�
 
 我们这里简单看看默认的算法pfifo_fast体会一下：
 
-        .. figure:: _static/nettune3.jpg
+  .. figure:: _static/nettune3.jpg
 
 FIFO很好理解，就是先入先出（有一个独立的算法叫pfifo），pfifo的队列长度可以用tc
 手工设置，pfifo的队列长度由驱动直接指明（netdev->tx_queue_len），如果超过长度没
@@ -1915,16 +1875,14 @@ FIFO很好理解，就是先入先出（有一个独立的算法叫pfifo），pf
 qdisc可以玩出延迟（比如通过netem强行delay每个包的发出，随机丢包等），限流，控制
 优先级等很多花样。它可以通过class进行叠加：
 
-        .. figure:: _static/nettune4.jpg
+  .. figure:: _static/nettune4.jpg
 
 （这个配置把sfq,tbf,sfq三个算法叠加在prio算法中，实现不同分类的包用不同的方式调
 度）
 
 这也给调优带来很多的变数，这些我们只能在具体的环境中做ftrace/perf才能跟踪出来了
 （幸运的是，网络子系统的tracepoint还是很完善的）。
-
-
-
+  
 ODP
 ----
 
