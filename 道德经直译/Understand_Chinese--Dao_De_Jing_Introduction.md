@@ -162,4 +162,3 @@ And again, all these are still names. When you do it, it is not just as it
 looks like. But if you follow the track of Dao, you will know you are on the
 right way.
 
-.. vim: tw=78 fo+=mM

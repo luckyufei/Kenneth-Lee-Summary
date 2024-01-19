@@ -40,7 +40,7 @@ Alloy有MacOS的Native版本，其他平台是java的，可以用java -jar运行
 代码在github上开源：
 `Alloy Source <https://github.com/AlloyTools/org.alloytools.alloy/releases>`_
 
-Alloy的作者为这个工具写了一本书，叫《\ *Software Abstractions*\ 》，详细介绍了
+Alloy的作者为这个工具写了一本书，叫《 *Software Abstractions* 》，详细介绍了
 这个工具的用法。但如果不熟悉相关概念，纯从程序员的角度去理解它，很容易把自己绕
 晕。本文会从程序员的角度通过澄清一些基本的概念来避免这个问题。而澄清这些基本概
 念，也有助于我们理解前面提到的逻辑哲学论和软件架构设计的思路。
@@ -573,7 +573,7 @@ one是这个关联针对Color的量词。这表示说，col是Fruit到Color的1�
 ### 例子
 
 
-这个小节我们通过《\ *Software Abstractions*\ 》中的一个例子来展开介绍Alloy的语
+这个小节我们通过《 *Software Abstractions* 》中的一个例子来展开介绍Alloy的语
 法和用途。
 
 下面这个模型定义建模“我是我自己的爷爷（或者外公）”这个命题的可能性：

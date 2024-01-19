@@ -86,8 +86,8 @@
 这些逻辑闭包抽象出来的名字作进一步的收缩，这样逐步收缩下去，这个系统的细节逻辑
 和我对它的抽象就对应起来了。
 
-网上有一个Maynard Handley先生写的关于Apple M1芯片的分析材料，很有名，叫\ *M1
-Explainer*\ 。他完全从一个非M1设计者的角度分析M1的设计思路，他的手法和我这个是
+网上有一个Maynard Handley先生写的关于Apple M1芯片的分析材料，很有名，叫 *M1
+Explainer* 。他完全从一个非M1设计者的角度分析M1的设计思路，他的手法和我这个是
 类似的，所以我也想用他的表述来增强我这个意思，他的说法是：
 
   | As I have said, I've written and rewritten, experimented and

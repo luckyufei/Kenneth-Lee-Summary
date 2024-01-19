@@ -44,4 +44,3 @@ Linux主线内核跟踪
   6.5
   others
 
-.. vim: tw=80 fo+=mM
