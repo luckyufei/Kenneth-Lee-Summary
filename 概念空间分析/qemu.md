@@ -39,7 +39,7 @@ Qemu使用glib作为基础设施，所以，读者如果需要和代码细节进
 
 整个qemu软件的执行模型用Pyhton作为伪码可以表达如下：
 
-.. code-block:: python
+```python
   
   def run_a_guest():
   vm = create_vm()
@@ -54,6 +54,7 @@ Qemu使用glib作为基础设施，所以，读者如果需要和代码细节进
   cpu.run(vm)
   except EIO eio:
   find_device(eio.io_address).handle_io();
+```
 
 Qemu是Host上的一个进程，它模拟了一个VM，这是我们理解Qemu的基础。
 
@@ -94,7 +95,7 @@ Qemu有两种运行模式：softmmu和user，前者模拟整个系统，后者�
 描述的主要是softmmu模式。User模拟的行为基本上是类似的，只是它不模拟VM，而是用一
 个vCPU模拟一个线程，在每个vCPU线程中的循环变成这样：
 
-.. code-block:: python
+```python
   
   def run_user():
   load_elf()
@@ -103,6 +104,7 @@ Qemu有两种运行模式：softmmu和user，前者模拟整个系统，后者�
   cpu.run(vm)
   except SysCall:
   do_local_syscall()
+```
 
 如果程序中发起创建新线程的系统调用，Qemu会创建新的线程去做一个新的循环。这种模
 拟模拟器里面再也不用做设备处理了，因为那些都是内核的事情，内核也不用通知Guest，
